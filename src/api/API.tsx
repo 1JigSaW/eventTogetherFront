@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-const apiUrl = 'https://selfinsight.net';
+const apiUrl = 'https://9536-66-205-90-12.ngrok-free.app';
 
 export class API {
   private static axios = axios.create({

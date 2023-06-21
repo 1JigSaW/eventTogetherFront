@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Animated,
+  Modal,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -16,28 +17,141 @@ import {
   WHITE_MAIN,
 } from '../../colors';
 import {Bold, Regular, SemiBold} from '../../fonts';
+import {useCreateUser} from '../queries/user';
+import {StackScreenProps} from '@react-navigation/stack';
+import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 
-const SignUpScreen = () => {
+type Props = StackScreenProps<HomeStackParamList, 'SignUpScreen'>;
+
+const SignUpScreen = ({navigation}: Props) => {
+  const [login, setLogin] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const [isLoginTouched, setIsLoginTouched] = useState(false);
+  const [isEmailTouched, setIsEmailTouched] = useState(false);
+  const [isPasswordTouched, setIsPasswordTouched] = useState(false);
+  const [isRepeatPasswordTouched, setIsRepeatPasswordTouched] = useState(false);
+
+  const createUserMutation = useCreateUser();
+
   const handleSendData = () => {
+    setIsLoginTouched(true);
+    setIsEmailTouched(true);
+    setIsPasswordTouched(true);
+    setIsRepeatPasswordTouched(true);
 
+    if (
+      login &&
+      email &&
+      password &&
+      repeatPassword &&
+      password === repeatPassword
+    ) {
+      createUserMutation.mutate(
+        {username: login, email: email, password: password},
+        {
+          onSuccess: () => {
+            navigation.navigate('HomeScreen');
+          },
+          onError: error => {
+            setErrorMessage(error?.response?.data.email);
+          },
+        },
+      );
+    }
+  };
+
+  const handleModalClose = () => {
+    setErrorMessage(null); // Clear error message
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!errorMessage}
+        onRequestClose={handleModalClose}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{errorMessage}</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={handleModalClose}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.content}>
         <View style={styles.centerBlock}>
           <Text style={styles.titleSignUp}>Sign Up</Text>
-          <TextInput style={styles.textInputLogin} placeholder="Login" />
-          <TextInput style={styles.textInputOther} placeholder="Email" />
-          <TextInput style={styles.textInputOther} placeholder="Password" />
           <TextInput
-            style={styles.textInputOther}
-            placeholder="Repeat password"
+            style={[styles.textInputLogin]}
+            placeholder="Login"
+            onChangeText={text => {
+              setLogin(text);
+              setIsLoginTouched(true);
+            }}
+            value={login}
           />
-          <Pressable style={styles.buttonCreate} onPress={handleSendData}>
+          <TextInput
+            style={[styles.textInputOther]}
+            placeholder="Email"
+            onChangeText={text => {
+              setEmail(text);
+              setIsEmailTouched(true);
+            }}
+            value={email}
+          />
+          <TextInput
+            style={[
+              styles.textInputOther,
+            ]}
+            placeholder="Password"
+            onChangeText={text => {
+              setPassword(text);
+              setIsPasswordTouched(true);
+            }}
+            value={password}
+          />
+          <TextInput
+            style={[
+              styles.textInputOther,
+            ]}
+            placeholder="Repeat password"
+            onChangeText={text => {
+              setRepeatPassword(text);
+              setIsRepeatPasswordTouched(true);
+            }}
+            value={repeatPassword}
+          />
+          <Pressable
+            style={[
+              styles.buttonCreate,
+              !(login && email && password && repeatPassword) && {
+                backgroundColor: GRAY_MAIN,
+                opacity: 0.2,
+              },
+            ]}
+            onPress={handleSendData}
+            disabled={
+              !(
+                login &&
+                email &&
+                password &&
+                repeatPassword &&
+                password === repeatPassword
+              )
+            }>
             <Text style={styles.buttonText}>Create</Text>
           </Pressable>
-          <Text style={styles.additionButton}>Sign in</Text>
+          <Pressable onPress={() => navigation.navigate('SignInScreen')}>
+            <Text style={styles.additionButton}>Sign in</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
@@ -116,6 +230,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: BLUE_MAIN,
     alignItems: 'center',
+    opacity: 1,
   },
   buttonText: {
     fontFamily: SemiBold,
@@ -129,6 +244,48 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: BLUE_MAIN,
     marginTop: 12,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)', // This is the background color of the overlay
+  },
+  modalView: {
+    width: '80%', // Set this to whatever size you want
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    marginTop: 15,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  errorInput: {
+    borderColor: 'red',
   },
 });
 
