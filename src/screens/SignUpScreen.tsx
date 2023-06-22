@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Modal,
   Pressable,
@@ -20,6 +21,8 @@ import {Bold, Regular, SemiBold} from '../../fonts';
 import {useCreateUser} from '../queries/user';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {USER} from '../../constants';
 
 type Props = StackScreenProps<HomeStackParamList, 'SignUpScreen'>;
 
@@ -29,6 +32,7 @@ const SignUpScreen = ({navigation}: Props) => {
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [isLoginTouched, setIsLoginTouched] = useState(false);
   const [isEmailTouched, setIsEmailTouched] = useState(false);
@@ -36,6 +40,20 @@ const SignUpScreen = ({navigation}: Props) => {
   const [isRepeatPasswordTouched, setIsRepeatPasswordTouched] = useState(false);
 
   const createUserMutation = useCreateUser();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await AsyncStorage.getItem(USER);
+
+      if (user != null) {
+        navigation.navigate('HomeScreen');
+      } else {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, [navigation]);
 
   const handleSendData = () => {
     setIsLoginTouched(true);
@@ -53,8 +71,15 @@ const SignUpScreen = ({navigation}: Props) => {
       createUserMutation.mutate(
         {username: login, email: email, password: password},
         {
-          onSuccess: () => {
-            navigation.navigate('HomeScreen');
+          onSuccess: async data => {
+            try {
+              // Сохраняем данные пользователя в AsyncStorage
+              await AsyncStorage.setItem(USER, JSON.stringify(data));
+
+              navigation.navigate('HomeScreen');
+            } catch (e) {
+              console.error(e);
+            }
           },
           onError: error => {
             setErrorMessage(error?.response?.data.email);
@@ -67,6 +92,14 @@ const SignUpScreen = ({navigation}: Props) => {
   const handleModalClose = () => {
     setErrorMessage(null); // Clear error message
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={BLACK_MAIN} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,9 +141,7 @@ const SignUpScreen = ({navigation}: Props) => {
             value={email}
           />
           <TextInput
-            style={[
-              styles.textInputOther,
-            ]}
+            style={[styles.textInputOther]}
             placeholder="Password"
             onChangeText={text => {
               setPassword(text);
@@ -119,9 +150,7 @@ const SignUpScreen = ({navigation}: Props) => {
             value={password}
           />
           <TextInput
-            style={[
-              styles.textInputOther,
-            ]}
+            style={[styles.textInputOther]}
             placeholder="Repeat password"
             onChangeText={text => {
               setRepeatPassword(text);

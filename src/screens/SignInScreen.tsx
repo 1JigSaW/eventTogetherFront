@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Animated,
+  Modal,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -18,23 +19,76 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import View = Animated.View;
 import {Bold, Regular, SemiBold} from '../../fonts';
+import {useLoginUser} from '../queries/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {USER} from '../../constants';
 
 type Props = StackScreenProps<HomeStackParamList, 'SignInScreen'>;
 
 const SignInScreen = ({navigation}: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  function handleSendData() {}
+  const loginUserMutation = useLoginUser();
+
+  function handleSendData() {
+    loginUserMutation.mutate({email, password});
+  }
+
+  useEffect(() => {
+    if (loginUserMutation.isError) {
+      // Обработка ошибки
+      setErrorMessage(loginUserMutation.error.response?.data.message);
+      console.error(loginUserMutation.error);
+    }
+
+    if (loginUserMutation.isSuccess && loginUserMutation.data) {
+      try {
+        // Сохраняем данные пользователя в AsyncStorage
+        AsyncStorage.setItem(USER, JSON.stringify(loginUserMutation.data));
+
+        navigation.navigate('HomeScreen');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [
+    loginUserMutation.error,
+    loginUserMutation.isError,
+    loginUserMutation.isSuccess,
+    loginUserMutation.data,
+    navigation,
+  ]);
+
+  const handleModalClose = () => {
+    setErrorMessage(null); // Clear error message
+  };
 
   return (
     <SafeAreaView style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!errorMessage}
+        onRequestClose={handleModalClose}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{errorMessage}</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={handleModalClose}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.content}>
         <View style={styles.centerBlock}>
           <Text style={styles.titleSignIn}>Sign In</Text>
           <TextInput
             style={[styles.textInputEmail]}
-            placeholder="Login"
+            placeholder="Email"
             onChangeText={text => {
               setEmail(text);
             }}
@@ -47,6 +101,7 @@ const SignInScreen = ({navigation}: Props) => {
               setPassword(text);
             }}
             value={password}
+            secureTextEntry={true}
           />
           <Pressable
             style={styles.forgotPasswordButton}
@@ -170,6 +225,48 @@ const styles = StyleSheet.create({
     color: BLACK_MAIN,
     fontFamily: SemiBold,
     fontSize: 14,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)', // This is the background color of the overlay
+  },
+  modalView: {
+    width: '80%', // Set this to whatever size you want
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+    marginTop: 15,
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  errorInput: {
+    borderColor: 'red',
   },
 });
 
