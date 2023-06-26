@@ -1,15 +1,5 @@
-import React, {useState} from 'react';
-import {
-  ActivityIndicator,
-  Animated,
-  FlatList,
-  Image,
-  ListRenderItem,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-} from 'react-native';
+import React from 'react';
+import {View, Text, Image, StyleSheet} from 'react-native';
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
@@ -17,78 +7,59 @@ import {
   RED_MAIN,
   WHITE_MAIN,
 } from '../../colors';
-import {StackScreenProps} from '@react-navigation/stack';
-import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Bold, Regular} from '../../fonts';
-import View = Animated.View;
-import SearchIcon from '../components/icons/SearchIcon';
-import PeopleIcon from '../components/icons/PeopleIcon';
-import AddIcon from '../components/icons/AddIcon';
-import HeartIcon from '../components/icons/HeartIcon';
-import {useEvents} from '../queries/event';
-import {Event} from '../api/event.api';
-import EventCard from '../components/EventCard';
+import PeopleIcon from './icons/PeopleIcon';
+import AddIcon from './icons/AddIcon';
+import HeartIcon from './icons/HeartIcon';
 
-type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
-
-const HomeScreen = ({navigation}: Props) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const {data, error, isLoading, isError, fetchNextPage, hasNextPage} =
-    useEvents(page);
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.insideBlock, styles.loadingContainer]}>
-          <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View>
-        <Text>Error: {error.message}</Text>
-      </View>
-    );
-  }
-
-  const handleLoadMore = () => {
-    if (hasNextPage) {
-      setPage(page + 1);
-      fetchNextPage();
-    }
-  };
-
-  const allData = data?.pages.flatMap(pageData => pageData.results) || [];
-
-  const renderItem: ListRenderItem<Event> = ({item}) => {
-    return <EventCard item={item} />;
-  };
-
+const EventCard = ({item}: any) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.insideBlock}>
-        <View style={styles.searchContainer}>
-          <SearchIcon size={100} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search..."
-            onChangeText={setSearch}
-            value={search}
+    <View style={styles.whiteBlock}>
+      <View style={styles.topPart}>
+        <View style={styles.leftPart}>
+          <Image
+            style={styles.image}
+            source={{uri: 'https://www.brandsoftheworld.com/logo/dsf'}}
           />
         </View>
-        <FlatList
-          data={allData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          onEndReached={handleLoadMore}
-          ListFooterComponent={<View style={{height: 50}} />}
-        />
+        <View style={styles.rightPart}>
+          <View style={styles.textRight}>
+            <Text style={styles.textCity}>{item.city}</Text>
+          </View>
+          <View style={styles.textRight}>
+            <Text style={styles.textDate}>
+              {new Date(item.date).toLocaleDateString()}
+            </Text>
+          </View>
+          <Text style={styles.textTitle}>{item.title}</Text>
+          <Text style={styles.textDescription}>
+            <Text style={styles.textDescription}>
+              {`${item.description.substring(0, 100)}...`}
+            </Text>
+          </Text>
+        </View>
       </View>
-    </SafeAreaView>
+      <View style={styles.bottomPart}>
+        <View style={styles.row}>
+          <PeopleIcon
+            size={100}
+            color={RED_MAIN}
+            style={{marginLeft: 15, marginBottom: 5.5}}
+          />
+          <Text style={styles.textCountPeople}>32</Text>
+          <View style={styles.invitation}>
+            <AddIcon size={100} />
+            <Text style={styles.invitationButton}>Wait for an invitation</Text>
+          </View>
+        </View>
+        <View style={styles.find}>
+          <Text style={styles.findText}>Find someone to go with</Text>
+        </View>
+        <View style={styles.row}>
+          <HeartIcon size={100} color={RED_MAIN} />
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -221,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default EventCard;

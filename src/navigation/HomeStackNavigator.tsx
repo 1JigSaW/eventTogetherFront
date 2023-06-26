@@ -3,12 +3,13 @@ import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SignInScreen from '../screens/SignInScreen';
 import React from 'react';
-import { Animated, StyleSheet } from "react-native";
+import { Animated, Pressable, StyleSheet } from "react-native";
 import View = Animated.View;
 import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
-import { BACKGROUND_MAIN } from "../../colors";
+import {BACKGROUND_MAIN} from '../../colors';
+import FavouritesScreen from '../screens/FavouritesScreen';
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -16,6 +17,7 @@ export type HomeStackParamList = {
   SignUpScreen: undefined;
   SignInScreen: undefined;
   HomeScreen: undefined;
+  FavouritesScreen: undefined;
 };
 
 function HomeStack() {
@@ -38,7 +40,7 @@ function HomeStack() {
       <HomeStackNavigator.Screen
         name={'HomeScreen'}
         component={HomeScreen}
-        options={{
+        options={({navigation}) => ({
           headerTitle: '',
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
@@ -49,10 +51,35 @@ function HomeStack() {
           headerRight: () => (
             <View style={styles.headerRight}>
               <MessagesIcon size={100} style={styles.headerRightOne} />
-              <FavouritesIcon size={100} />
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <FavouritesIcon size={100} />
+              </Pressable>
             </View>
           ),
-        }}
+        })}
+      />
+      <HomeStackNavigator.Screen
+        name={'FavouritesScreen'}
+        component={FavouritesScreen}
+        options={({navigation}) => ({
+          headerTitle: 'Favourites',
+          headerStyle: {
+            backgroundColor: BACKGROUND_MAIN,
+          },
+          headerTitleStyle: {
+            textAlign: 'center',
+          },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <FavouritesIcon size={100} />
+              </Pressable>
+            </View>
+          ),
+        })}
       />
     </HomeStackNavigator.Navigator>
   );
