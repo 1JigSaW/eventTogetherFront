@@ -1,14 +1,51 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
-import {Animated, StyleSheet} from 'react-native';
+import { ActivityIndicator, Animated, ScrollView, StyleSheet, Text } from "react-native";
 import {BACKGROUND_MAIN} from '../../colors';
-import React from 'react';
+import React, {useContext} from 'react';
 import View = Animated.View;
+import {UserContext} from '../../App';
+import { useGetEvent, useGetEvents, useGetUserFavourites } from "../queries/favourite";
+import EventCard from '../components/EventCard';
 
 type Props = StackScreenProps<HomeStackParamList, 'FavouritesScreen'>;
 
 const FavouritesScreen = ({navigation}: Props) => {
-  return <View style={styles.container} />;
+  const {user} = useContext(UserContext);
+
+  const {
+    data: userFavourites,
+    isLoading: isLoadingFavourites,
+    isError: isErrorFavourites,
+  } = useGetUserFavourites(user);
+
+  const eventIds =
+    userFavourites?.map(favourite => favourite.favourite_event) || [];
+
+  const {
+    data: events,
+    isLoading: isLoadingEvents,
+    isError: isErrorEvents,
+  } = useGetEvents(eventIds);
+
+  const isLoading = isLoadingFavourites || isLoadingEvents;
+  const isError = isErrorFavourites || isErrorEvents;
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (isError || !events) {
+    return <Text>Error loading favourites or events...</Text>;
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      {events.map((event: Event) => (
+        <EventCard key={event} item={event} />
+      ))}
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({

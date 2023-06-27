@@ -39,4 +39,14 @@ export class UserFavouriteApi {
       throw error;
     }
   }
+
+  static async getEvent(eventId: number): Promise<Event> {
+    try {
+      const {data} = await API.get(`/api/events/${eventId}/`);
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

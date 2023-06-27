@@ -18,7 +18,11 @@ import {Bold, Regular} from '../../fonts';
 import PeopleIcon from './icons/PeopleIcon';
 import AddIcon from './icons/AddIcon';
 import HeartIcon from './icons/HeartIcon';
-import { useAddUserFavourite, useGetUserFavourites, useRemoveUserFavourite } from "../queries/favourite";
+import {
+  useAddUserFavourite,
+  useGetUserFavourites,
+  useRemoveUserFavourite,
+} from '../queries/favourite';
 import {UserContext} from '../../App';
 
 const EventCard = ({item}: any) => {
