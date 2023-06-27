@@ -16,10 +16,10 @@ export const useAddUserFavourite = () => {
   );
 };
 
-export const useGetUserFavourites = () => {
+export const useGetUserFavourites = (userId: number | null) => {
   return useQuery<UserFavourite[], Error>(
-    [GET_USER_FAVOURITES_QUERY_KEY],
-    UserFavouriteApi.getUserFavourites,
+    [GET_USER_FAVOURITES_QUERY_KEY, userId],
+    () => UserFavouriteApi.getUserFavourites(userId),
     {
       onError: (error: any) => {
         console.error(error);
@@ -27,3 +27,16 @@ export const useGetUserFavourites = () => {
     },
   );
 };
+
+export const useRemoveUserFavourite = () => {
+  return useMutation<void, Error, UserFavourite>(
+    (favouriteData: UserFavourite) =>
+      UserFavouriteApi.removeUserFavourite(favouriteData),
+    {
+      onError: (error: any) => {
+        console.error(error);
+      },
+    },
+  );
+};
+

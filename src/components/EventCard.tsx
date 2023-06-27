@@ -1,5 +1,12 @@
-import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
@@ -11,8 +18,55 @@ import {Bold, Regular} from '../../fonts';
 import PeopleIcon from './icons/PeopleIcon';
 import AddIcon from './icons/AddIcon';
 import HeartIcon from './icons/HeartIcon';
+import { useAddUserFavourite, useGetUserFavourites, useRemoveUserFavourite } from "../queries/favourite";
+import {UserContext} from '../../App';
 
 const EventCard = ({item}: any) => {
+  const {user} = useContext(UserContext);
+  const addUserFavourite = useAddUserFavourite();
+  const removeUserFavourite = useRemoveUserFavourite();
+
+  const {data: userFavourites, isLoading, isError} = useGetUserFavourites(user);
+
+  const [isFavourite, setIsFavourite] = useState(false);
+
+  useEffect(() => {
+    if (userFavourites) {
+      const favouriteIds = userFavourites.map(fav => fav.favourite_event);
+      setIsFavourite(favouriteIds.includes(item.id));
+    }
+  }, [item.id, userFavourites]);
+
+  const handleAddToFavourite = () => {
+    if (isFavourite) {
+      removeUserFavourite.mutate(
+        {user: user, favourite_event: item.id},
+        {
+          onSuccess: () => {
+            setIsFavourite(false);
+          },
+        },
+      );
+    } else {
+      addUserFavourite.mutate(
+        {user: user, favourite_event: item.id},
+        {
+          onSuccess: () => {
+            setIsFavourite(true);
+          },
+        },
+      );
+    }
+  };
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (isError) {
+    return <Text>Error loading favourites...</Text>;
+  }
+
   return (
     <View style={styles.whiteBlock}>
       <View style={styles.topPart}>
@@ -55,9 +109,13 @@ const EventCard = ({item}: any) => {
         <View style={styles.find}>
           <Text style={styles.findText}>Find someone to go with</Text>
         </View>
-        <View style={styles.row}>
-          <HeartIcon size={100} color={RED_MAIN} />
-        </View>
+        <Pressable style={styles.row} onPress={handleAddToFavourite}>
+          {!isFavourite ? (
+            <HeartIcon size={100} color={RED_MAIN} />
+          ) : (
+            <HeartIcon size={100} color={BLUE_MAIN} />
+          )}
+        </Pressable>
       </View>
     </View>
   );

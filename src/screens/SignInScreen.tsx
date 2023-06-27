@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import {
   Animated,
   Modal,
@@ -22,6 +22,7 @@ import {Bold, Regular, SemiBold} from '../../fonts';
 import {useLoginUser} from '../queries/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from '../../constants';
+import {UserContext} from '../../App';
 
 type Props = StackScreenProps<HomeStackParamList, 'SignInScreen'>;
 
@@ -29,6 +30,7 @@ const SignInScreen = ({navigation}: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
+  const {setUser} = useContext(UserContext);
 
   const loginUserMutation = useLoginUser();
 
@@ -37,17 +39,10 @@ const SignInScreen = ({navigation}: Props) => {
   }
 
   useEffect(() => {
-    if (loginUserMutation.isError) {
-      // Обработка ошибки
-      setErrorMessage(loginUserMutation.error.response?.data.message);
-      console.error(loginUserMutation.error);
-    }
-
     if (loginUserMutation.isSuccess && loginUserMutation.data) {
       try {
-        // Сохраняем данные пользователя в AsyncStorage
-        AsyncStorage.setItem(USER, JSON.stringify(loginUserMutation.data));
-
+        AsyncStorage.setItem(USER, loginUserMutation.data.userId.toString());
+        setUser(loginUserMutation.data.userId);
         navigation.navigate('HomeScreen');
       } catch (e) {
         console.error(e);
@@ -59,6 +54,7 @@ const SignInScreen = ({navigation}: Props) => {
     loginUserMutation.isSuccess,
     loginUserMutation.data,
     navigation,
+    setUser,
   ]);
 
   const handleModalClose = () => {

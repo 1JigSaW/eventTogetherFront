@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Animated,
   FlatList,
-  Image,
   ListRenderItem,
   SafeAreaView,
   StyleSheet,
@@ -14,7 +13,6 @@ import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
   BLUE_MAIN,
-  RED_MAIN,
   WHITE_MAIN,
 } from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -22,9 +20,6 @@ import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Bold, Regular} from '../../fonts';
 import View = Animated.View;
 import SearchIcon from '../components/icons/SearchIcon';
-import PeopleIcon from '../components/icons/PeopleIcon';
-import AddIcon from '../components/icons/AddIcon';
-import HeartIcon from '../components/icons/HeartIcon';
 import {useEvents} from '../queries/event';
 import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';

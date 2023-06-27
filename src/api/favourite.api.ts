@@ -1,7 +1,7 @@
 import {API} from './API';
 
 export interface UserFavourite {
-  user: number;
+  user: number | null;
   favourite_event: number;
 }
 
@@ -10,7 +10,7 @@ export class UserFavouriteApi {
     favouriteData: UserFavourite,
   ): Promise<UserFavourite> {
     try {
-      const {data} = await API.post('/favourites/add/', favouriteData);
+      const {data} = await API.post('/api/favourites/add/', favouriteData);
       console.log(data);
       return data;
     } catch (error) {
@@ -18,9 +18,21 @@ export class UserFavouriteApi {
     }
   }
 
-  static async getUserFavourites(): Promise<UserFavourite[]> {
+  static async removeUserFavourite(
+    favouriteData: UserFavourite,
+  ): Promise<void> {
     try {
-      const {data} = await API.get('/favourites/');
+      await API.delete('/api/favourites/remove/', {data: favouriteData});
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getUserFavourites(
+    userId: number | null,
+  ): Promise<UserFavourite[]> {
+    try {
+      const {data} = await API.get(`/api/favourites/${userId}/`);
       console.log(data);
       return data;
     } catch (error) {
