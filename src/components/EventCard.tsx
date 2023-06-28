@@ -27,6 +27,7 @@ import {UserContext} from '../../App';
 
 const EventCard = ({item}: any) => {
   const {user} = useContext(UserContext);
+  console.log(user);
   const addUserFavourite = useAddUserFavourite();
   const removeUserFavourite = useRemoveUserFavourite();
 
@@ -104,7 +105,9 @@ const EventCard = ({item}: any) => {
             color={RED_MAIN}
             style={{marginLeft: 15, marginBottom: 5.5}}
           />
-          <Text style={styles.textCountPeople}>32</Text>
+          <Text style={styles.textCountPeople}>
+            {item.awaiting_invite.length}
+          </Text>
           <View style={styles.invitation}>
             <AddIcon size={100} />
             <Text style={styles.invitationButton}>Wait for an invitation</Text>

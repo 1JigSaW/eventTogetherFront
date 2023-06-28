@@ -10,6 +10,7 @@ import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
 import {BACKGROUND_MAIN} from '../../colors';
 import FavouritesScreen from '../screens/FavouritesScreen';
+import AccountScreen from "../screens/AccountScreen";
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -18,6 +19,7 @@ export type HomeStackParamList = {
   SignInScreen: undefined;
   HomeScreen: undefined;
   FavouritesScreen: undefined;
+  AccountScreen: undefined;
 };
 
 function HomeStack() {
@@ -44,9 +46,14 @@ function HomeStack() {
           headerTitle: '',
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
           },
           headerLeft: () => (
-            <ProfileIcon size={100} style={styles.headerLeft} />
+            <Pressable onPress={() => navigation.navigate('AccountScreen')}>
+              <ProfileIcon size={100} style={styles.headerLeft} />
+            </Pressable>
           ),
           headerRight: () => (
             <View style={styles.headerRight}>
@@ -66,6 +73,34 @@ function HomeStack() {
           headerTitle: 'Favourites',
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTitleStyle: {
+            textAlign: 'center',
+          },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <FavouritesIcon size={100} />
+              </Pressable>
+            </View>
+          ),
+        })}
+      />
+      <HomeStackNavigator.Screen
+        name={'AccountScreen'}
+        component={AccountScreen}
+        options={({navigation}) => ({
+          headerTitle: 'Account',
+          headerStyle: {
+            backgroundColor: BACKGROUND_MAIN,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',

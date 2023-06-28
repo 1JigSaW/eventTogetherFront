@@ -44,7 +44,6 @@ const SignUpScreen = ({navigation}: Props) => {
   useEffect(() => {
     const checkUser = async () => {
       const user = await AsyncStorage.getItem(USER);
-
       if (user != null) {
         navigation.navigate('HomeScreen');
       } else {
