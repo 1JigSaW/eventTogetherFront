@@ -5,10 +5,10 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useState} from 'react';
@@ -16,8 +16,8 @@ import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import {Bold, Regular} from '../../fonts';
 import {useSearchInterests} from '../queries/interest';
+import {CustomSelector} from '../components/CustomSelector';
 import {useSearchLanguages} from '../queries/language';
-import Autocomplete from 'react-native-autocomplete-input';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
@@ -29,15 +29,11 @@ const AccountScreen = ({navigation}: Props) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  const [interestQuery, setInterestQuery] = useState('');
-  const [languageQuery, setLanguageQuery] = useState('');
-
-  const {data: interests} = useSearchInterests(interestQuery);
-  const {data: languages} = useSearchLanguages(languageQuery);
-  console.log(languages);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const handleSubmit = () => {
-    console.log(2);
+    console.log(secondName);
   };
 
   return (
@@ -45,77 +41,68 @@ const AccountScreen = ({navigation}: Props) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.containerFull}>
       <SafeAreaView style={styles.container}>
-        <View style={styles.insideBlock}>
-          <View style={styles.profileBlock}>
-            <ProfileIcon size={450} />
-          </View>
-          <View>
-            <Text style={styles.infoText}>Info:</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="First Name"
-              value={firstName}
-              onChangeText={setFirstName}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Second Name"
-              value={secondName}
-              onChangeText={setSecondName}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Age"
-              value={age}
-              onChangeText={setAge}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Description"
-              value={description}
-              onChangeText={setDescription}
-            />
-            <View>
-              <Autocomplete
-                style={styles.textInput}
-                autoCorrect={false}
-                data={languages ? languages : []}
-                defaultValue={languageQuery}
-                onChangeText={text => {
-                  setLanguageQuery(text);
-                }}
-                placeholder={'Languages'}
-                flatListProps={{
-                  keyboardShouldPersistTaps: 'always',
-                  keyExtractor: (_, idx) => 'key-' + idx,
-                  renderItem: ({item}: any) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setLanguageQuery(item.name);
-                      }}>
-                      <Text>{item.name}</Text>
-                    </TouchableOpacity>
-                  ),
-                }}
-              />
+        <View style={{flex: 1}}>
+          <ScrollView keyboardShouldPersistTaps="always">
+            <View style={styles.insideBlock}>
+              <View style={styles.profileBlock}>
+                <ProfileIcon size={450} />
+              </View>
+              <View>
+                <Text style={styles.infoText}>Info:</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="First Name"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Second Name"
+                  value={secondName}
+                  onChangeText={setSecondName}
+                />
+                <CustomSelector
+                  selectedItems={selectedLanguages}
+                  onSelect={setSelectedLanguages}
+                  useSearchItems={useSearchLanguages}
+                  placeholder="Add language"
+                />
+                <CustomSelector
+                  selectedItems={selectedInterests}
+                  onSelect={setSelectedInterests}
+                  useSearchItems={useSearchInterests}
+                  placeholder="Add hobby"
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Age"
+                  value={age}
+                  onChangeText={setAge}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Description"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+              </View>
+              <View style={styles.passwordBlock}>
+                <Text style={styles.infoText}>Password:</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Old password"
+                  value={oldPassword}
+                  onChangeText={setOldPassword}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="New password"
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                />
+              </View>
             </View>
-
-          </View>
-          <View style={styles.passwordBlock}>
-            <Text style={styles.infoText}>Password:</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Old password"
-              value={oldPassword}
-              onChangeText={setOldPassword}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="New password"
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-          </View>
+          </ScrollView>
         </View>
       </SafeAreaView>
       <Pressable style={styles.saveButtonBlock} onPress={handleSubmit}>
@@ -123,7 +110,6 @@ const AccountScreen = ({navigation}: Props) => {
       </Pressable>
     </KeyboardAvoidingView>
   );
-
 };
 
 const styles = StyleSheet.create({
