@@ -1,6 +1,7 @@
 import {API} from './API';
 
 export interface UserProfileData {
+  id?: number;
   user: number | null;
   first_name: string;
   last_name: string;
@@ -13,7 +14,7 @@ export interface UserProfileData {
 export class UserProfileApi {
   static async updateUserProfile(
     userProfileData: UserProfileData,
-  ): Promise<UserProfileData> {
+  ): Promise<{user_profile_id: number; data: UserProfileData}> {
     try {
       const {data} = await API.put(
         `/api/userprofile/update/${userProfileData.user}/`,

@@ -11,7 +11,6 @@ export class UserFavouriteApi {
   ): Promise<UserFavourite> {
     try {
       const {data} = await API.post('/api/favourites/add/', favouriteData);
-      console.log(data);
       return data;
     } catch (error) {
       throw error;
@@ -33,7 +32,6 @@ export class UserFavouriteApi {
   ): Promise<UserFavourite[]> {
     try {
       const {data} = await API.get(`/api/favourites/${userId}/`);
-      console.log(data);
       return data;
     } catch (error) {
       throw error;
@@ -43,7 +41,6 @@ export class UserFavouriteApi {
   static async getEvent(eventId: number): Promise<Event> {
     try {
       const {data} = await API.get(`/api/events/${eventId}/`);
-      console.log(data);
       return data;
     } catch (error) {
       throw error;

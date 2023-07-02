@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -55,7 +55,7 @@ const HomeScreen = ({navigation}: Props) => {
   const allData = data?.pages.flatMap(pageData => pageData.results) || [];
 
   const renderItem: ListRenderItem<Event> = ({item}) => {
-    return <EventCard item={item} />;
+    return <EventCard item={item} navigation={navigation} />;
   };
 
   return (

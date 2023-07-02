@@ -46,7 +46,7 @@ const FavouritesScreen = ({navigation}: Props) => {
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       <View style={styles.insideBlock}>
         {events.map((event: Event) => (
-          <EventCard key={event} item={event} />
+          <EventCard key={event} item={event} navigation={navigation} />
         ))}
       </View>
     </ScrollView>

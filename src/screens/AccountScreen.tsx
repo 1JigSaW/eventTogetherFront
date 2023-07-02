@@ -36,7 +36,7 @@ import {UserProfileData} from '../api/userprofile';
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
 const AccountScreen = ({navigation}: Props) => {
-  const {user} = useContext(UserContext);
+  const {user, setUserProfileExist, setUserProfile} = useContext(UserContext);
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
   const [age, setAge] = useState('');
@@ -130,8 +130,6 @@ const AccountScreen = ({navigation}: Props) => {
       interests: selectedInterests,
       description,
     };
-    console.log(JSON.stringify(originalProfileData));
-    console.log(JSON.stringify(currentData));
     return JSON.stringify(currentData) !== JSON.stringify(originalProfileData);
   };
 
@@ -158,8 +156,13 @@ const AccountScreen = ({navigation}: Props) => {
         language: selectedLanguages,
         interests: selectedInterests,
       };
-      console.log('Form data: ', formData);
-      updateUserProfileMutation.mutate(formData);
+
+      updateUserProfileMutation.mutate(formData, {
+        onSuccess: response => {
+          setUserProfileExist(true);
+          setUserProfile(response.user_profile_id);
+        },
+      });
     }
   };
 
@@ -168,13 +171,9 @@ const AccountScreen = ({navigation}: Props) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.containerFull}>
       <SafeAreaView style={styles.container}>
-        {userProfileDetailQuery.isLoading && (
-          <ActivityIndicator size="large" color="#0000ff" />
-        )}
-
-        {userProfileDetailQuery.isError && (
-          <Text>Error loading user profile details</Text>
-        )}
+        {/*{userProfileDetailQuery.isLoading && (*/}
+        {/*  <ActivityIndicator size="large" color="#0000ff" />*/}
+        {/*)}*/}
         <View style={{flex: 1}}>
           <ScrollView keyboardShouldPersistTaps="always">
             {updateUserProfileMutation.isSuccess && (

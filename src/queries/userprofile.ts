@@ -13,7 +13,11 @@ interface AxiosError extends Error {
 }
 
 export const useUpdateUserProfile = () => {
-  return useMutation<UserProfileData, AxiosError, UserProfileData>(
+  return useMutation<
+    {user_profile_id: number; data: UserProfileData},
+    AxiosError,
+    UserProfileData
+  >(
     (userProfileData: UserProfileData) =>
       UserProfileApi.updateUserProfile(userProfileData),
     {
@@ -27,19 +31,13 @@ export const useUpdateUserProfile = () => {
     },
   );
 };
-
 export const useUserProfileDetail = (userId: number | null) => {
   return useQuery<UserProfileData, AxiosError>(
     [USER_PROFILE_DETAIL_QUERY_KEY, userId],
     () => UserProfileApi.getUserProfileDetail(userId),
     {
-      onError: error => {
-        if (error.response && error.response.status === 404) {
-          console.error(error.response.data.error);
-        } else {
-          console.error(error);
-        }
-      },
+      retry: 0,
     },
   );
 };
+

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,15 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
-  BLUE_MAIN,
+  BLUE_MAIN, ORANGE_MAIN,
   RED_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+  WHITE_MAIN
+} from "../../colors";
 import {Bold, Regular} from '../../fonts';
 import PeopleIcon from './icons/PeopleIcon';
 import AddIcon from './icons/AddIcon';
@@ -24,16 +25,30 @@ import {
   useRemoveUserFavourite,
 } from '../queries/favourite';
 import {UserContext} from '../../App';
+import {useAddUserToEvent, useRemoveUserFromEvent} from '../queries/event';
+import CloseIcon from './icons/CloseIcon';
 
-const EventCard = ({item}: any) => {
-  const {user} = useContext(UserContext);
-  console.log(user);
+const EventCard = ({item, navigation}: any) => {
+  const {user, userProfileExist, userProfile} = useContext(UserContext);
   const addUserFavourite = useAddUserFavourite();
   const removeUserFavourite = useRemoveUserFavourite();
+  const addUserToEventMutation = useAddUserToEvent();
+  const removeUserFromEventMutation = useRemoveUserFromEvent();
 
   const {data: userFavourites, isLoading, isError} = useGetUserFavourites(user);
+  const [invitesCount, setInvitesCount] = useState(item.awaiting_invite.length);
 
   const [isFavourite, setIsFavourite] = useState(false);
+
+  const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
+
+  useEffect(() => {
+    setAwaitingInvite(
+      item.awaiting_invite.some((invite: number | null) => {
+        return invite === userProfile;
+      }),
+    );
+  }, [item.awaiting_invite, userProfile]);
 
   useEffect(() => {
     if (userFavourites) {
@@ -63,6 +78,51 @@ const EventCard = ({item}: any) => {
       );
     }
   };
+  const handleAddWait = () => {
+    if (!userProfileExist) {
+      Alert.alert('Profile not found', 'Create your profile first', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Go to Profile',
+          onPress: () => {
+            navigation.navigate('AccountScreen');
+          },
+        },
+      ]);
+      return;
+    } else {
+      if (awaitingInvite) {
+        removeUserFromEventMutation.mutate(
+          {
+            eventId: item.id,
+            userId: user,
+          },
+          {
+            onSuccess: () => {
+              setAwaitingInvite(false);
+              setInvitesCount((prevCount: number) => prevCount - 1);
+            },
+          },
+        );
+      } else {
+        addUserToEventMutation.mutate(
+          {
+            eventId: item.id,
+            userId: user,
+          },
+          {
+            onSuccess: () => {
+              setAwaitingInvite(true);
+              setInvitesCount((prevCount: number) => prevCount + 1);
+            },
+          },
+        );
+      }
+    }
+  };
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -71,7 +131,6 @@ const EventCard = ({item}: any) => {
   if (isError) {
     return <Text>Error loading favourites...</Text>;
   }
-
   return (
     <View style={styles.whiteBlock}>
       <View style={styles.topPart}>
@@ -105,13 +164,24 @@ const EventCard = ({item}: any) => {
             color={RED_MAIN}
             style={{marginLeft: 15, marginBottom: 5.5}}
           />
-          <Text style={styles.textCountPeople}>
-            {item.awaiting_invite.length}
-          </Text>
-          <View style={styles.invitation}>
-            <AddIcon size={100} />
-            <Text style={styles.invitationButton}>Wait for an invitation</Text>
-          </View>
+          <Text style={styles.textCountPeople}>{invitesCount}</Text>
+          <Pressable style={[styles.invitation, awaitingInvite && {backgroundColor: ORANGE_MAIN}]} onPress={handleAddWait}>
+            {awaitingInvite ? (
+              <>
+                <Text style={[styles.invitationButton, {marginRight: 5}]}>
+                  You are on the waiting list
+                </Text>
+                <CloseIcon size={85} />
+              </>
+            ) : (
+              <>
+                <AddIcon size={100} />
+                <Text style={styles.invitationButton}>
+                  Wait for an invitation
+                </Text>
+              </>
+            )}
+          </Pressable>
         </View>
         <View style={styles.find}>
           <Text style={styles.findText}>Find someone to go with</Text>

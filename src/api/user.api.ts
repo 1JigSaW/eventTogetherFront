@@ -21,7 +21,6 @@ export class UserApi {
   static async registerUser(userData: User): Promise<User> {
     try {
       const {data} = await API.post('/api/register/', userData);
-      console.log(data);
       return data;
     } catch (error) {
       throw error;
@@ -31,7 +30,6 @@ export class UserApi {
   static async loginUser(loginData: LoginData): Promise<any> {
     try {
       const {data} = await API.post('/api/auth/', loginData);
-      console.log(data);
       return data;
     } catch (error) {
       throw error;
@@ -45,7 +43,6 @@ export class UserApi {
         new_password: pass.newPassword,
         user: pass.user,
       });
-      console.log(data);
       return data;
     } catch (error) {
       throw error;

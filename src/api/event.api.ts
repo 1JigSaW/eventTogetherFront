@@ -34,4 +34,26 @@ export class EventApi {
       throw error;
     }
   }
+
+  static async addUserToEvent(
+    eventId: number,
+    userId: number | null,
+  ): Promise<void> {
+    try {
+      await API.post(`/api/events/${eventId}/add_user/`, {user_id: userId});
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async removeUserFromEvent(
+    eventId: number,
+    userId: number | null,
+  ): Promise<void> {
+    try {
+      await API.delete(`/api/remove-user-from-event/${eventId}/${userId}/`);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
