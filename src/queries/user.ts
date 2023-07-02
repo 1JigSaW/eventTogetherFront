@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {LoginData, User, UserApi} from '../api/user.api';
+import {LoginData, Password, User, UserApi} from '../api/user.api';
 
 export const USER_QUERY_KEY = 'user_register';
 export const USER_LOGIN_QUERY_KEY = 'user_login';
@@ -37,6 +37,20 @@ export const useLoginUser = () => {
         } else {
           console.error(error);
         }
+      },
+    },
+  );
+};
+
+export const useChangePassword = () => {
+  return useMutation<any, AxiosError, Password>(
+    (pass: Password) => UserApi.changePassword(pass),
+    {
+      onError: error => {
+        console.error(error);
+      },
+      onSuccess: data => {
+        console.log(data);
       },
     },
   );

@@ -5,3 +5,4 @@ export const GRAY_MAIN = 'rgba(0, 0, 0, 0.5);';
 export const BLUE_MAIN = '#75DCE8';
 export const RED_MAIN = '#FD2923';
 export const ORANGE_MAIN = '#F7BF89';
+export const GREEN_MAIN = '#00D843';

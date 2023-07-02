@@ -1,6 +1,7 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,17 +12,31 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
-import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
+import React, {useContext, useEffect, useState} from 'react';
+import {
+  BACKGROUND_MAIN,
+  BLACK_MAIN,
+  BLUE_MAIN,
+  GREEN_MAIN,
+  WHITE_MAIN,
+} from '../../colors';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import {Bold, Regular} from '../../fonts';
 import {useSearchInterests} from '../queries/interest';
 import {CustomSelector} from '../components/CustomSelector';
 import {useSearchLanguages} from '../queries/language';
+import {
+  useUpdateUserProfile,
+  useUserProfileDetail,
+} from '../queries/userprofile';
+import {UserContext} from '../../App';
+import {useChangePassword} from '../queries/user';
+import {UserProfileData} from '../api/userprofile';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
 const AccountScreen = ({navigation}: Props) => {
+  const {user} = useContext(UserContext);
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
   const [age, setAge] = useState('');
@@ -32,8 +47,120 @@ const AccountScreen = ({navigation}: Props) => {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
+  const [firstNameValid, setFirstNameValid] = useState(true);
+  const [secondNameValid, setSecondNameValid] = useState(true);
+  const [ageValid, setAgeValid] = useState(true);
+  const [languagesValid, setLanguagesValid] = useState(false);
+  const [interestsValid, setInterestsValid] = useState(false);
+
+  const [firstNameTouched, setFirstNameTouched] = useState(false);
+  const [secondNameTouched, setSecondNameTouched] = useState(false);
+  const [ageTouched, setAgeTouched] = useState(false);
+  const [languagesTouched, setLanguagesTouched] = useState(false);
+  const [interestsTouched, setInterestsTouched] = useState(false);
+
+  const [originalProfileData, setOriginalProfileData] =
+    useState<UserProfileData | null>(null);
+
+  const userProfileDetailQuery = useUserProfileDetail(user);
+  const updateUserProfileMutation = useUpdateUserProfile();
+  const changePasswordMutation = useChangePassword();
+
+  useEffect(() => {
+    if (userProfileDetailQuery.data) {
+      const profileData = userProfileDetailQuery.data;
+      setFirstName(profileData.first_name);
+      setSecondName(profileData.last_name);
+      setAge(String(profileData.age));
+      setDescription(profileData.description || '');
+      setSelectedLanguages(profileData.language);
+      setSelectedInterests(profileData.interests);
+      setOriginalProfileData(profileData);
+    }
+  }, [userProfileDetailQuery.data]);
+
+  const validateForm = () => {
+    let valid = true;
+
+    if (firstName === '') {
+      setFirstNameValid(false);
+      valid = false;
+    } else {
+      setFirstNameValid(true);
+    }
+
+    if (secondName === '') {
+      setSecondNameValid(false);
+      valid = false;
+    } else {
+      setSecondNameValid(true);
+    }
+
+    if (age === '') {
+      setAgeValid(false);
+      valid = false;
+    } else {
+      setAgeValid(true);
+    }
+
+    if (selectedLanguages.length === 0) {
+      setLanguagesValid(false);
+      valid = false;
+    } else {
+      setLanguagesValid(true);
+    }
+
+    if (selectedInterests.length === 0) {
+      setInterestsValid(false);
+      valid = false;
+    } else {
+      setInterestsValid(true);
+    }
+
+    return valid;
+  };
+
+  const hasDataChanged = () => {
+    const currentData = {
+      user: user,
+      first_name: firstName,
+      last_name: secondName,
+      age: parseInt(age, 10),
+      language: selectedLanguages,
+      interests: selectedInterests,
+      description,
+    };
+    console.log(JSON.stringify(originalProfileData));
+    console.log(JSON.stringify(currentData));
+    return JSON.stringify(currentData) !== JSON.stringify(originalProfileData);
+  };
+
   const handleSubmit = () => {
-    console.log(secondName);
+    setFirstNameTouched(true);
+    setSecondNameTouched(true);
+    setAgeTouched(true);
+    setLanguagesTouched(true);
+    setInterestsTouched(true);
+
+    if (oldPassword && newPassword) {
+      changePasswordMutation.mutate({oldPassword, newPassword, user});
+      setNewPassword('');
+      setOldPassword('');
+    }
+
+    if (validateForm() && hasDataChanged()) {
+      const formData = {
+        user: user,
+        first_name: firstName,
+        last_name: secondName,
+        age: parseInt(age, 10),
+        description,
+        language: selectedLanguages,
+        interests: selectedInterests,
+      };
+      console.log('Form data: ', formData);
+      updateUserProfileMutation.mutate(formData);
+    }
   };
 
   return (
@@ -41,40 +168,93 @@ const AccountScreen = ({navigation}: Props) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.containerFull}>
       <SafeAreaView style={styles.container}>
+        {userProfileDetailQuery.isLoading && (
+          <ActivityIndicator size="large" color="#0000ff" />
+        )}
+
+        {userProfileDetailQuery.isError && (
+          <Text>Error loading user profile details</Text>
+        )}
         <View style={{flex: 1}}>
           <ScrollView keyboardShouldPersistTaps="always">
+            {updateUserProfileMutation.isSuccess && (
+              <Text style={styles.successSave}>
+                Your profile has been successfully updated!
+              </Text>
+            )}
+            {changePasswordMutation.isSuccess && (
+              <Text style={styles.successSave}>
+                Your password has been successfully updated!
+              </Text>
+            )}
             <View style={styles.insideBlock}>
               <View style={styles.profileBlock}>
-                <ProfileIcon size={450} />
+                <ProfileIcon size={250} />
               </View>
               <View>
                 <Text style={styles.infoText}>Info:</Text>
                 <TextInput
-                  style={styles.textInput}
+                  style={[
+                    styles.textInput,
+                    firstNameTouched &&
+                      !firstNameValid &&
+                      firstName === '' &&
+                      styles.error,
+                  ]}
                   placeholder="First Name"
                   value={firstName}
-                  onChangeText={setFirstName}
+                  onChangeText={text => {
+                    setFirstName(text);
+                    setFirstNameTouched(true);
+                  }}
                 />
                 <TextInput
-                  style={styles.textInput}
+                  style={[
+                    styles.textInput,
+                    secondNameTouched &&
+                      !secondNameValid &&
+                      secondName === '' &&
+                      styles.error,
+                  ]}
                   placeholder="Second Name"
                   value={secondName}
-                  onChangeText={setSecondName}
+                  onChangeText={text => {
+                    setSecondName(text);
+                    setSecondNameTouched(true);
+                  }}
                 />
                 <CustomSelector
+                  style={
+                    !languagesValid &&
+                    languagesTouched &&
+                    selectedLanguages.length === 0
+                      ? styles.error
+                      : undefined
+                  }
                   selectedItems={selectedLanguages}
                   onSelect={setSelectedLanguages}
                   useSearchItems={useSearchLanguages}
                   placeholder="Add language"
                 />
                 <CustomSelector
+                  style={
+                    !interestsValid &&
+                    interestsTouched &&
+                    selectedInterests.length === 0
+                      ? styles.error
+                      : undefined
+                  }
                   selectedItems={selectedInterests}
                   onSelect={setSelectedInterests}
                   useSearchItems={useSearchInterests}
                   placeholder="Add hobby"
                 />
+
                 <TextInput
-                  style={styles.textInput}
+                  style={[
+                    styles.textInput,
+                    !ageValid && age === '' && styles.error,
+                  ]}
                   placeholder="Age"
                   value={age}
                   onChangeText={setAge}
@@ -88,26 +268,34 @@ const AccountScreen = ({navigation}: Props) => {
               </View>
               <View style={styles.passwordBlock}>
                 <Text style={styles.infoText}>Password:</Text>
+                {changePasswordMutation.isError && (
+                  <Text style={styles.errorText}>Enter correct password</Text>
+                )}
+                {changePasswordMutation.isSuccess && (
+                  <Text style={styles.successText}>Enter correct password</Text>
+                )}
                 <TextInput
                   style={styles.textInput}
                   placeholder="Old password"
                   value={oldPassword}
                   onChangeText={setOldPassword}
+                  secureTextEntry={true}
                 />
                 <TextInput
                   style={styles.textInput}
                   placeholder="New password"
                   value={newPassword}
                   onChangeText={setNewPassword}
+                  secureTextEntry={true}
                 />
               </View>
             </View>
+            <Pressable style={styles.saveButtonBlock} onPress={handleSubmit}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </Pressable>
           </ScrollView>
         </View>
       </SafeAreaView>
-      <Pressable style={styles.saveButtonBlock} onPress={handleSubmit}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </Pressable>
     </KeyboardAvoidingView>
   );
 };
@@ -137,6 +325,12 @@ const styles = StyleSheet.create({
     color: BLACK_MAIN,
     fontFamily: Bold,
   },
+  successSave: {
+    fontSize: 18,
+    padding: 5,
+    alignSelf: 'center',
+    color: GREEN_MAIN,
+  },
   textInput: {
     backgroundColor: WHITE_MAIN,
     marginTop: 8,
@@ -156,13 +350,27 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE_MAIN,
     alignItems: 'center',
     marginHorizontal: 12,
-    marginBottom: 34,
+    marginBottom: 14,
+    marginTop: 10,
     borderRadius: 15,
   },
   saveButtonText: {
     color: BLACK_MAIN,
     fontSize: 24,
     lineHeight: 47,
+    fontFamily: Regular,
+  },
+  error: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    alignSelf: 'center',
+    fontFamily: Regular,
+  },
+  successText: {
+    color: GREEN_MAIN,
+    alignSelf: 'center',
     fontFamily: Regular,
   },
 });

@@ -9,12 +9,7 @@ import {
   Text,
   TextInput,
 } from 'react-native';
-import {
-  BACKGROUND_MAIN,
-  BLACK_MAIN,
-  BLUE_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Bold, Regular} from '../../fonts';

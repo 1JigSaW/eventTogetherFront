@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  ViewStyle,
 } from 'react-native';
 import {BLACK_MAIN, ORANGE_MAIN, WHITE_MAIN} from '../../colors';
 import CloseIcon from './icons/CloseIcon';
@@ -15,6 +16,7 @@ interface Props {
   onSelect: (languages: string[]) => void;
   useSearchItems: (query: string) => {data: any};
   placeholder: string;
+  style?: ViewStyle | undefined;
 }
 
 export const CustomSelector: React.FC<Props> = ({
@@ -22,6 +24,7 @@ export const CustomSelector: React.FC<Props> = ({
   onSelect,
   useSearchItems,
   placeholder,
+  style,
 }) => {
   const [query, setQuery] = useState('');
   const {data: items} = useSearchItems(query);
@@ -42,7 +45,7 @@ export const CustomSelector: React.FC<Props> = ({
           </View>
         ))}
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, style]}
           autoCorrect={false}
           onChangeText={setQuery}
           value={query}
