@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -15,7 +15,7 @@ import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Bold, Regular} from '../../fonts';
 import View = Animated.View;
 import SearchIcon from '../components/icons/SearchIcon';
-import {useEvents} from '../queries/event';
+import {useEvents, useSearchEvents} from '../queries/event';
 import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';
 
@@ -26,21 +26,18 @@ const HomeScreen = ({navigation}: Props) => {
   const [page, setPage] = useState(1);
   const {data, error, isLoading, isError, fetchNextPage, hasNextPage} =
     useEvents(page);
+  const {
+    data: searchResults,
+    isLoading: isLoadingSearch,
+    error: errorSearch,
+  } = useSearchEvents(search.length > 2 ? search : null);
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.insideBlock, styles.loadingContainer]}>
-          <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const noResultsMessage = "No events found matching the search query";
 
-  if (isError) {
+  if (isError || (search && errorSearch)) {
     return (
       <View>
-        <Text>Error: {error.message}</Text>
+        <Text>Error: {(error || errorSearch).message}</Text>
       </View>
     );
   }
@@ -54,9 +51,12 @@ const HomeScreen = ({navigation}: Props) => {
 
   const allData = data?.pages.flatMap(pageData => pageData.results) || [];
 
+  const displayedData = search ? searchResults || [] : allData;
+
   const renderItem: ListRenderItem<Event> = ({item}) => {
     return <EventCard item={item} navigation={navigation} />;
   };
+  console.log(searchResults?.length);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,17 +66,22 @@ const HomeScreen = ({navigation}: Props) => {
           <TextInput
             style={styles.searchInput}
             placeholder="Search..."
-            onChangeText={setSearch}
+            onChangeText={text => setSearch(text)}
             value={search}
           />
         </View>
-        <FlatList
-          data={allData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          onEndReached={handleLoadMore}
-          ListFooterComponent={<View style={{height: 50}} />}
-        />
+        {searchResults?.length === undefined && search.length > 2 ? (
+          <Text style={styles.notFoundText}>{noResultsMessage}</Text>
+        ) : (
+          <FlatList
+            data={displayedData}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            onEndReached={handleLoadMore}
+            ListFooterComponent={<View style={{height: 50}} />}
+          />
+        )}
+        {(isLoading || isLoadingSearch) && <ActivityIndicator />}
       </View>
     </SafeAreaView>
   );
@@ -208,6 +213,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  notFoundText: {
+    fontSize: 16,
+    color: BLACK_MAIN,
+    fontFamily: Regular,
+    alignSelf: 'center',
   },
 });
 

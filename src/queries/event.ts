@@ -1,9 +1,14 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {EventApi, EventArray} from '../api/event.api';
-import { API } from "../api/API";
 
 export const EVENT_QUERY_KEY = 'events';
 export const EVENT_ADD_USER_QUERY_KEY = 'event_add_user';
+const SEARCH_EVENTS_QUERY_KEY = 'search_events';
 
 interface AxiosError extends Error {
   response?: {
@@ -41,8 +46,6 @@ export const useEvents = (page: number) => {
   );
 };
 
-
-
 export function useAddUserToEvent() {
   const queryClient = useQueryClient();
   return useMutation(
@@ -64,6 +67,25 @@ export function useRemoveUserFromEvent() {
     {
       onSuccess: (data, variables) => {
         queryClient.invalidateQueries(['event', variables.eventId]);
+      },
+    },
+  );
+}
+
+export function useSearchEvents(query: string | null) {
+  return useQuery(
+    [SEARCH_EVENTS_QUERY_KEY, query],
+    () => EventApi.searchEvents(query),
+    {
+      enabled: query !== '', // only run the query if the 'query' is not an empty string
+      retry: 1, // number of retry attempts
+      refetchOnWindowFocus: false, // do not refetch when window regains focus
+      onError: (error: any) => {
+        if (error.response && error.response.status >= 400) {
+          console.error(error.response.data.message);
+        } else {
+          console.error(error);
+        }
       },
     },
   );

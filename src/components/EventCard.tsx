@@ -11,10 +11,11 @@ import {
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
-  BLUE_MAIN, ORANGE_MAIN,
+  BLUE_MAIN,
+  ORANGE_MAIN,
   RED_MAIN,
-  WHITE_MAIN
-} from "../../colors";
+  WHITE_MAIN,
+} from '../../colors';
 import {Bold, Regular} from '../../fonts';
 import PeopleIcon from './icons/PeopleIcon';
 import AddIcon from './icons/AddIcon';
@@ -165,7 +166,12 @@ const EventCard = ({item, navigation}: any) => {
             style={{marginLeft: 15, marginBottom: 5.5}}
           />
           <Text style={styles.textCountPeople}>{invitesCount}</Text>
-          <Pressable style={[styles.invitation, awaitingInvite && {backgroundColor: ORANGE_MAIN}]} onPress={handleAddWait}>
+          <Pressable
+            style={[
+              styles.invitation,
+              awaitingInvite && {backgroundColor: ORANGE_MAIN},
+            ]}
+            onPress={handleAddWait}>
             {awaitingInvite ? (
               <>
                 <Text style={[styles.invitationButton, {marginRight: 5}]}>
@@ -312,7 +318,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 10,
     marginBottom: 4,
-    marginLeft: 10,
   },
   findText: {
     fontSize: 10,

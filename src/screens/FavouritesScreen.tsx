@@ -38,15 +38,19 @@ const FavouritesScreen = ({navigation}: Props) => {
   const isError = isErrorFavourites || isErrorEvents;
 
   if (isError || !events) {
-    return <Text>Error loading favourites or events...</Text>;
+    return (
+      <ScrollView style={styles.container}>
+        <Text>Error loading favourites or events...</Text>
+      </ScrollView>
+    );
   }
 
   return (
     <ScrollView style={styles.container}>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       <View style={styles.insideBlock}>
-        {events.map((event: Event) => (
-          <EventCard key={event} item={event} navigation={navigation} />
+        {events.map((event: Event, index) => (
+          <EventCard key={index} item={event} navigation={navigation} />
         ))}
       </View>
     </ScrollView>
@@ -60,6 +64,7 @@ const styles = StyleSheet.create({
   },
   insideBlock: {
     marginHorizontal: 8,
+    paddingBottom: 10,
   },
 });
 

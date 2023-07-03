@@ -25,6 +25,8 @@ export interface EventArray {
   results: Event[];
 }
 
+
+
 export class EventApi {
   static async getEvents(page: number = 1): Promise<EventArray> {
     try {
@@ -52,6 +54,15 @@ export class EventApi {
   ): Promise<void> {
     try {
       await API.delete(`/api/remove-user-from-event/${eventId}/${userId}/`);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async searchEvents(query: string | null): Promise<Event[]> {
+    try {
+      const {data} = await API.get(`/api/events/search/?query=${query}`);
+      return data;
     } catch (error) {
       throw error;
     }
