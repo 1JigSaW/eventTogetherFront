@@ -1,4 +1,5 @@
 import {API} from './API';
+import { UserProfileData } from "./userprofile";
 
 export interface Attendee {
   id: number;
@@ -24,8 +25,6 @@ export interface EventArray {
   previous: string;
   results: Event[];
 }
-
-
 
 export class EventApi {
   static async getEvents(page: number = 1): Promise<EventArray> {
@@ -62,6 +61,20 @@ export class EventApi {
   static async searchEvents(query: string | null): Promise<Event[]> {
     try {
       const {data} = await API.get(`/api/events/search/?query=${query}`);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getEventProfiles(
+    eventId: number,
+    page: number = 1,
+  ): Promise<any> {
+    try {
+      const {data} = await API.get(
+        `/api/event_profiles/${eventId}/?page=${page}`,
+      );
       return data;
     } catch (error) {
       throw error;

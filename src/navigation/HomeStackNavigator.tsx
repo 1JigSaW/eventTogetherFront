@@ -3,14 +3,15 @@ import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SignInScreen from '../screens/SignInScreen';
 import React from 'react';
-import { Animated, Pressable, StyleSheet } from "react-native";
+import {Animated, Pressable, StyleSheet} from 'react-native';
 import View = Animated.View;
 import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
 import {BACKGROUND_MAIN} from '../../colors';
 import FavouritesScreen from '../screens/FavouritesScreen';
-import AccountScreen from "../screens/AccountScreen";
+import AccountScreen from '../screens/AccountScreen';
+import WaitingScreen from '../screens/WaitingScreen';
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -20,6 +21,9 @@ export type HomeStackParamList = {
   HomeScreen: undefined;
   FavouritesScreen: undefined;
   AccountScreen: undefined;
+  WaitingScreen: {
+    event: number;
+  };
 };
 
 function HomeStack() {
@@ -96,6 +100,31 @@ function HomeStack() {
         component={AccountScreen}
         options={({navigation}) => ({
           headerTitle: 'Account',
+          headerStyle: {
+            backgroundColor: BACKGROUND_MAIN,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTitleStyle: {
+            textAlign: 'center',
+          },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <FavouritesIcon size={100} />
+              </Pressable>
+            </View>
+          ),
+        })}
+      />
+      <HomeStackNavigator.Screen
+        name={'WaitingScreen'}
+        component={WaitingScreen}
+        options={({navigation}) => ({
+          headerTitle: 'Waiting list',
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
             borderBottomWidth: 0,

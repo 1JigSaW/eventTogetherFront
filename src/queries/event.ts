@@ -90,3 +90,14 @@ export function useSearchEvents(query: string | null) {
     },
   );
 }
+
+export function useEventProfiles(eventId: number) {
+  return useInfiniteQuery(
+    ['eventProfiles', eventId],
+    ({pageParam = 1}) => EventApi.getEventProfiles(eventId, pageParam),
+    {
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.next ? lastPage.next.split('=')[1] : false,
+    },
+  );
+}

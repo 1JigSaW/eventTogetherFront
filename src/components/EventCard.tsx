@@ -160,12 +160,18 @@ const EventCard = ({item, navigation}: any) => {
       </View>
       <View style={styles.bottomPart}>
         <View style={styles.row}>
-          <PeopleIcon
-            size={100}
-            color={RED_MAIN}
-            style={{marginLeft: 15, marginBottom: 5.5}}
-          />
-          <Text style={styles.textCountPeople}>{invitesCount}</Text>
+          <Pressable
+            style={styles.row}
+            onPress={() =>
+              navigation.navigate('WaitingScreen', {event: item.id})
+            }>
+            <PeopleIcon
+              size={100}
+              color={RED_MAIN}
+              style={{marginLeft: 15, marginBottom: 5.5}}
+            />
+            <Text style={styles.textCountPeople}>{invitesCount}</Text>
+          </Pressable>
           <Pressable
             style={[
               styles.invitation,

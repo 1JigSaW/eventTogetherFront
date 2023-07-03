@@ -32,7 +32,7 @@ const HomeScreen = ({navigation}: Props) => {
     error: errorSearch,
   } = useSearchEvents(search.length > 2 ? search : null);
 
-  const noResultsMessage = "No events found matching the search query";
+  const noResultsMessage = 'No events found matching the search query';
 
   if (isError || (search && errorSearch)) {
     return (
@@ -56,7 +56,6 @@ const HomeScreen = ({navigation}: Props) => {
   const renderItem: ListRenderItem<Event> = ({item}) => {
     return <EventCard item={item} navigation={navigation} />;
   };
-  console.log(searchResults?.length);
 
   return (
     <SafeAreaView style={styles.container}>
