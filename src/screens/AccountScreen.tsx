@@ -1,7 +1,6 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +17,7 @@ import {
   BLACK_MAIN,
   BLUE_MAIN,
   GREEN_MAIN,
+  RED_MAIN,
   WHITE_MAIN,
 } from '../../colors';
 import ProfileIcon from '../components/icons/ProfileIcon';
@@ -32,11 +32,14 @@ import {
 import {UserContext} from '../../App';
 import {useChangePassword} from '../queries/user';
 import {UserProfileData} from '../api/userprofile';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {USER} from '../../constants';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
 const AccountScreen = ({navigation}: Props) => {
-  const {user, setUserProfileExist, setUserProfile} = useContext(UserContext);
+  const {user, setUserProfileExist, setUserProfile, setUser} =
+    useContext(UserContext);
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
   const [age, setAge] = useState('');
@@ -166,6 +169,14 @@ const AccountScreen = ({navigation}: Props) => {
     }
   };
 
+  async function handleLogout() {
+    await AsyncStorage.removeItem(USER);
+    setUser(null);
+    setUserProfile(null);
+    setUserProfileExist(false);
+    navigation.navigate('SignInScreen');
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -292,6 +303,9 @@ const AccountScreen = ({navigation}: Props) => {
             <Pressable style={styles.saveButtonBlock} onPress={handleSubmit}>
               <Text style={styles.saveButtonText}>Save</Text>
             </Pressable>
+            <Pressable style={styles.logoutButtonBlock} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </Pressable>
           </ScrollView>
         </View>
       </SafeAreaView>
@@ -371,6 +385,20 @@ const styles = StyleSheet.create({
     color: GREEN_MAIN,
     alignSelf: 'center',
     fontFamily: Regular,
+  },
+  logoutButtonBlock: {
+    backgroundColor: RED_MAIN,
+    alignItems: 'center',
+    marginHorizontal: 12,
+    marginBottom: 14,
+    marginTop: 10,
+    borderRadius: 15,
+  },
+  logoutButtonText: {
+    fontFamily: Regular,
+    fontSize: 16,
+    lineHeight: 27,
+    color: BLACK_MAIN,
   },
 });
 

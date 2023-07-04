@@ -11,11 +11,11 @@ const queryClient = new QueryClient();
 
 type UserContextProps = {
   user: number | null;
-  setUser: (value: number) => void;
+  setUser: (value: number | null) => void;
   userProfileExist: boolean;
   setUserProfileExist: (value: boolean) => void;
   userProfile: number | null;
-  setUserProfile: (value: number) => void;
+  setUserProfile: (value: number | null) => void;
 };
 
 export const UserContext = createContext<UserContextProps>({
@@ -56,7 +56,9 @@ const App = () => {
         try {
           const userProfile = await UserProfileApi.getUserProfileDetail(user);
           setUserProfileExist(true);
-          setUserProfile(userProfile.id); // предполагая, что объект userProfile содержит поле id
+          if (userProfile.id) {
+            setUserProfile(userProfile?.id);
+          }
         } catch (error) {
           console.error(error);
           setUserProfileExist(false);

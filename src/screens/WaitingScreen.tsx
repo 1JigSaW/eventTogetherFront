@@ -1,25 +1,24 @@
 import React, {useContext} from 'react';
 import {UserContext} from '../../App';
+import { FlatList, ListRenderItem, Pressable, StyleSheet, Text, View } from "react-native";
 import {
-  FlatList,
-  ListRenderItem,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { BACKGROUND_MAIN, BLACK_MAIN, ORANGE_MAIN, WHITE_MAIN } from "../../colors";
+  BACKGROUND_MAIN,
+  BLACK_MAIN,
+  ORANGE_MAIN,
+  WHITE_MAIN,
+} from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useEventProfiles} from '../queries/event';
 import {UserProfileData} from '../api/userprofile';
 import ProfileIcon from '../components/icons/ProfileIcon';
-import { Bold, Regular } from "../../fonts";
+import {Bold, Regular} from '../../fonts';
 
 type Props = StackScreenProps<HomeStackParamList, 'WaitingScreen'>;
 
-const WaitingScreen = ({route}: Props) => {
+const WaitingScreen = ({navigation, route}: Props) => {
   const {event} = route.params;
+  const {user} = useContext(UserContext);
   const {data: attendees, isLoading, error} = useEventProfiles(event);
 
   const allAttendees = attendees?.pages.flatMap(page => page.results) || [];
@@ -70,9 +69,18 @@ const WaitingScreen = ({route}: Props) => {
         {item.description && (
           <Text style={styles.textAddition}>{item.description}</Text>
         )}
-        <View style={styles.buttonInvite}>
-          <Text style={styles.textAddition}>Invite</Text>
-        </View>
+        {item.user !== user && (
+          <Pressable
+            style={styles.buttonInvite}
+            onPress={() =>
+              navigation.navigate('ChatScreen', {
+                event: event,
+                receiver: item.id || 0,
+              })
+            }>
+            <Text style={styles.textAddition}>Invite</Text>
+          </Pressable>
+        )}
       </View>
     );
   };

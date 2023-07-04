@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -23,10 +23,12 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from '../../constants';
+import { UserContext } from "../../App";
 
 type Props = StackScreenProps<HomeStackParamList, 'SignUpScreen'>;
 
 const SignUpScreen = ({navigation}: Props) => {
+  const {setUser} = useContext(UserContext);
   const [login, setLogin] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -74,7 +76,7 @@ const SignUpScreen = ({navigation}: Props) => {
             try {
               // Сохраняем данные пользователя в AsyncStorage
               await AsyncStorage.setItem(USER, JSON.stringify(data));
-
+              // setUser(data.user);
               navigation.navigate('HomeScreen');
             } catch (e) {
               console.error(e);
