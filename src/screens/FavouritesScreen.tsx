@@ -34,6 +34,8 @@ const FavouritesScreen = ({navigation}: Props) => {
     isError: isErrorEvents,
   } = useGetEvents(eventIds);
 
+  console.log(events);
+
   const isLoading = isLoadingFavourites || isLoadingEvents;
   const isError = isErrorFavourites || isErrorEvents;
 
@@ -49,7 +51,7 @@ const FavouritesScreen = ({navigation}: Props) => {
     <ScrollView style={styles.container}>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       <View style={styles.insideBlock}>
-        {events.map((event: Event, index) => (
+        {events.map((event: Event, index: number) => (
           <EventCard key={index} item={event} navigation={navigation} />
         ))}
       </View>

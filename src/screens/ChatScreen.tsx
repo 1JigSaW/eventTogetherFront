@@ -1,60 +1,100 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {GiftedChat} from 'react-native-gifted-chat';
+import React, {useEffect, useContext, useState} from 'react';
+import {Bubble, GiftedChat, IMessage} from 'react-native-gifted-chat';
 import SocketIOClient from 'socket.io-client';
-import {UserContext} from '../../App';
+import {queryClient, UserContext} from '../../App';
 import {
-  MESSAGE_SEND_QUERY_KEY,
-  useEventMessages,
+  CHAT_MESSAGES_QUERY_KEY,
+  useChatMessages,
   useSendMessage,
 } from '../queries/chat';
-import {useQueryClient} from '@tanstack/react-query';
-import { ChatScreenProps, HomeStackParamList } from "../navigation/HomeStackNavigator";
+import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Text} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
+import {MessageData} from '../api/chat.api';
 
 type Props = StackScreenProps<HomeStackParamList, 'ChatScreen'>;
 
+type PostMessage = {
+  _id?: number;
+  text: string;
+  createdAt: Date;
+  user: {
+    _id: number;
+    // other user properties like name, avatar
+  };
+  sent: boolean;
+  received: boolean;
+};
+
 const ChatScreen = ({route}: Props) => {
-  const {event, receiver} = route.params;
+  const {chat, recipientUserId} = route.params;
   const {userProfile} = useContext(UserContext);
   const socket = SocketIOClient('http://localhost:3000'); // Replace with your server address
-  const {data: messages, isLoading, isError} = useEventMessages(event);
+  const {data: messagesData, isLoading, isError} = useChatMessages(chat);
   const sendMessageMutation = useSendMessage();
-  const queryClient = useQueryClient();
+
+  const [messages, setMessages] = useState<PostMessage[]>([]);
 
   useEffect(() => {
-    socket.on('message', message => {
-      queryClient.invalidateQueries([MESSAGE_SEND_QUERY_KEY, event]);
-    });
-  }, [event, queryClient, socket]);
+    if (messagesData) {
+      const formattedMessages = messagesData
+        .map((m: MessageData) => ({
+          _id: m.id,
+          text: m.content,
+          createdAt: new Date(m.timestamp),
+          user: {
+            _id: m.sender.id,
+            // other user properties like name, avatar
+          },
+          sent: m.sender.id === userProfile,
+          received: m.sender.id !== userProfile,
+        }))
+        .reverse();
+      setMessages(formattedMessages);
+    }
+  }, [messagesData, userProfile]);
 
-  const onSend = (messages = []) => {
-    sendMessageMutation.mutate({
-      id: 0,
-      event: event,
+  const onSend = (messages: {text: string}[] = []) => {
+    const messageData = {
+      chat: chat,
       sender: userProfile,
-      receiver: receiver,
       content: messages[0].text,
-      timestamp: new Date().getTime(),
+      timestamp: new Date().toISOString(),
+    };
+
+    const newMessage: any = {
+      _id: Math.random().toString(), // temporary ID before the real one is returned from the server
+      text: messageData.content,
+      createdAt: new Date(messageData.timestamp),
+      user: {
+        _id: messageData.sender,
+        // other user properties like name, avatar
+      },
+      sent: true,
+      received: false,
+    };
+    setMessages((previousMessages): any =>
+      GiftedChat.append(previousMessages, newMessage),
+    );
+
+    sendMessageMutation.mutate(messageData, {
+      onSuccess: data => {
+        setMessages(previousMessages =>
+          previousMessages.map(message =>
+            message._id === newMessage._id
+              ? {...message, _id: data.id as number} // Use type assertion to explicitly set _id as number
+              : message,
+          ),
+        );
+      },
     });
   };
 
-  const formattedMessages = messages?.map(
-    (m: {
-      id?: any;
-      content: any;
-      timestamp: string | number | Date;
-      sender: any;
-    }) => ({
-      _id: m.id,
-      text: m.content,
-      createdAt: new Date(m.timestamp),
-      user: {
-        _id: m.sender,
-        // other user properties like name, avatar
-      },
-    }),
-  );
+  useEffect(() => {
+    socket.on('message', () => {
+      queryClient.invalidateQueries([CHAT_MESSAGES_QUERY_KEY, chat]);
+    });
+  }, [chat, socket]);
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -65,9 +105,31 @@ const ChatScreen = ({route}: Props) => {
 
   return (
     <GiftedChat
-      messages={formattedMessages}
+      messages={
+        messages.map((message: PostMessage) => ({
+          _id: message?._id?.toString(),
+          text: message.text,
+          createdAt: message.createdAt,
+          user: message.user,
+          sent: message.sent,
+          received: message.received,
+        })) as IMessage[]
+      }
       onSend={messages => onSend(messages)}
       user={{_id: userProfile}}
+      renderBubble={props => (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            left: {
+              backgroundColor: '#f0f0f0', // background color for received messages
+            },
+            right: {
+              backgroundColor: '#0099ff', // background color for sent messages
+            },
+          }}
+        />
+      )}
     />
   );
 };

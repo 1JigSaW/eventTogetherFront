@@ -74,8 +74,7 @@ const WaitingScreen = ({navigation, route}: Props) => {
             style={styles.buttonInvite}
             onPress={() =>
               navigation.navigate('ChatScreen', {
-                event: event,
-                receiver: item.id || 0,
+                recipientUserId: item.user,
               })
             }>
             <Text style={styles.textAddition}>Invite</Text>

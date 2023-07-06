@@ -33,8 +33,8 @@ export type HomeStackParamList = {
   };
   MessageScreen: undefined;
   ChatScreen: {
-    event: number;
-    receiver: number;
+    chat?: number;
+    recipientUserId?: number | null;
   };
 };
 
@@ -100,7 +100,9 @@ function HomeStack() {
           },
           headerRight: () => (
             <View style={styles.headerRight}>
-              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+                <MessagesIcon size={100} style={styles.headerRightOne} />
+              </Pressable>
               <Pressable
                 onPress={() => navigation.navigate('FavouritesScreen')}>
                 <FavouritesIcon size={100} />
@@ -125,7 +127,9 @@ function HomeStack() {
           },
           headerRight: () => (
             <View style={styles.headerRight}>
-              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+                <MessagesIcon size={100} style={styles.headerRightOne} />
+              </Pressable>
               <Pressable
                 onPress={() => navigation.navigate('FavouritesScreen')}>
                 <FavouritesIcon size={100} />
@@ -150,7 +154,9 @@ function HomeStack() {
           },
           headerRight: () => (
             <View style={styles.headerRight}>
-              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+                <MessagesIcon size={100} style={styles.headerRightOne} />
+              </Pressable>
               <Pressable
                 onPress={() => navigation.navigate('FavouritesScreen')}>
                 <FavouritesIcon size={100} />
@@ -199,7 +205,9 @@ function HomeStack() {
           },
           headerRight: () => (
             <View style={styles.headerRight}>
-              <MessagesIcon size={100} style={styles.headerRightOne} />
+              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+                <MessagesIcon size={100} style={styles.headerRightOne} />
+              </Pressable>
               <Pressable
                 onPress={() => navigation.navigate('FavouritesScreen')}>
                 <FavouritesIcon size={100} />

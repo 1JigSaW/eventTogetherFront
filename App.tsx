@@ -7,7 +7,7 @@ import {USER} from './constants';
 import {ActivityIndicator} from 'react-native';
 import {UserProfileApi} from './src/api/userprofile';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 type UserContextProps = {
   user: number | null;

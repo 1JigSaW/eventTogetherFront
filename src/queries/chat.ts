@@ -4,6 +4,7 @@ import {AxiosError} from 'axios';
 
 export const MESSAGE_SEND_QUERY_KEY = 'message_send';
 export const EVENT_MESSAGES_QUERY_KEY = 'event_messages';
+export const CHAT_MESSAGES_QUERY_KEY = 'chat_messages';
 
 export const useSendMessage = () => {
   return useMutation<MessageData, AxiosError, MessageData>(
@@ -20,24 +21,35 @@ export const useSendMessage = () => {
   );
 };
 
-export const useEventMessages = (eventId: number | null) => {
+export const useChatMessages = (chatId: number | null) => {
   return useQuery<MessageData[], AxiosError>(
-    [EVENT_MESSAGES_QUERY_KEY, eventId],
-    () => ChatApi.getEventMessages(eventId),
+    [CHAT_MESSAGES_QUERY_KEY, chatId],
+    () => ChatApi.getChatMessages(chatId),
     {
       retry: 0,
     },
   );
 };
 
-export const USER_MESSAGES_QUERY_KEY = 'user_messages';
 
-export const useUserMessages = (userId: number | null) => {
+export const useUserChats = (userId: number | null) => {
   return useQuery<MessageData[], AxiosError>(
-    [USER_MESSAGES_QUERY_KEY, userId],
-    () => ChatApi.getUserMessages(userId),
+    [EVENT_MESSAGES_QUERY_KEY, userId],
+    () => ChatApi.getUserChats(userId),
     {
       retry: 0,
+    },
+  );
+};
+
+
+export const useCreateChat = () => {
+  return useMutation<any, AxiosError, number>(
+    (recipientUserId: number) => ChatApi.createChat(recipientUserId),
+    {
+      onError: error => {
+        console.error(error);
+      },
     },
   );
 };
