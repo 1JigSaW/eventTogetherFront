@@ -18,19 +18,26 @@ import SearchIcon from '../components/icons/SearchIcon';
 import {useEvents, useSearchEvents} from '../queries/event';
 import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';
+import { useFocusEffect } from "@react-navigation/native";
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 const HomeScreen = ({navigation}: Props) => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const {data, error, isLoading, isError, fetchNextPage, hasNextPage} =
+  const {data, error, isLoading, isError, fetchNextPage, hasNextPage, refetch} =
     useEvents(page);
   const {
     data: searchResults,
     isLoading: isLoadingSearch,
     error: errorSearch,
   } = useSearchEvents(search.length > 2 ? search : null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   const noResultsMessage = 'No events found matching the search query';
 

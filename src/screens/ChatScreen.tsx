@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useState} from 'react';
+import React, { useEffect, useContext, useState, useLayoutEffect } from "react";
 import {Bubble, GiftedChat, IMessage} from 'react-native-gifted-chat';
 import SocketIOClient from 'socket.io-client';
 import {queryClient, UserContext} from '../../App';
@@ -12,6 +12,8 @@ import {
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MessageData} from '../api/chat.api';
+import { Dimensions, StyleSheet, View } from "react-native";
+import { BACKGROUND_MAIN } from "../../colors";
 
 type Props = StackScreenProps<HomeStackParamList, 'ChatScreen'>;
 
@@ -27,7 +29,7 @@ type PostMessage = {
   received: boolean;
 };
 
-const ChatScreen = ({route}: Props) => {
+const ChatScreen = ({navigation, route}: Props) => {
   const {chat, user: tempUser, event} = route.params;
   const {userProfile} = useContext(UserContext);
   const socket = SocketIOClient('http://localhost:3000'); // Replace with your server address
@@ -37,7 +39,6 @@ const ChatScreen = ({route}: Props) => {
   const [messages, setMessages] = useState<PostMessage[]>([]);
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [chatId, setChatId] = useState<any>(chat); // Initialize chatId with initialChat
-  console.log(userProfile, tempUser, event, chat);
 
   const {data: chatIdData} = useGetChatId(userProfile, tempUser, event);
 
@@ -47,6 +48,18 @@ const ChatScreen = ({route}: Props) => {
     }
   }, [chatIdData]);
   const {data: messagesData} = useChatMessages(chatId);
+
+  useLayoutEffect(() => {
+    if (messagesData && messagesData[0].chat.user1.id !== userProfile) {
+      navigation.setOptions({
+        title: `${messagesData[0].chat.user1.first_name} ${messagesData[0].chat.user1.last_name}`,
+      });
+    } else if (messagesData) {
+      navigation.setOptions({
+        title: `${messagesData[0].chat.user2.first_name} ${messagesData[0].chat.user2.last_name}`,
+      });
+    }
+  }, [messagesData, navigation, userProfile]);
 
   useEffect(() => {
     if (messagesData) {
@@ -135,36 +148,48 @@ const ChatScreen = ({route}: Props) => {
       queryClient.invalidateQueries([CHAT_MESSAGES_QUERY_KEY, chat]);
     });
   }, [chat, socket]);
-
+  const screenWidth = Dimensions.get('window').width;
   return (
-    <GiftedChat
-      messages={
-        messages.map((message: PostMessage) => ({
-          _id: message?._id?.toString(),
-          text: message.text,
-          createdAt: message.createdAt,
-          user: message.user,
-          sent: message.sent,
-          received: message.received,
-        })) as IMessage[]
-      }
-      onSend={messages => onSend(messages)}
-      user={{_id: userProfile !== null ? userProfile : 0}}
-      renderBubble={props => (
-        <Bubble
-          {...props}
-          wrapperStyle={{
-            left: {
-              backgroundColor: '#f0f0f0', // background color for received messages
-            },
-            right: {
-              backgroundColor: '#0099ff', // background color for sent messages
-            },
-          }}
-        />
-      )}
-    />
+    <View style={{flex: 1, width: '100%', backgroundColor: BACKGROUND_MAIN}}>
+      <GiftedChat
+        messages={
+          messages.map((message: PostMessage) => ({
+            _id: message?._id?.toString(),
+            text: message.text,
+            createdAt: message.createdAt,
+            user: message.user,
+            sent: message.sent,
+            received: message.received,
+          })) as IMessage[]
+        }
+        onSend={messages => onSend(messages)}
+        user={{_id: userProfile !== null ? userProfile : 0}}
+        renderBubble={props => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              left: {
+                borderWidth: 1,
+                backgroundColor: '#ffffff',
+                marginLeft: -40,
+              },
+              right: {
+                borderWidth: 1,
+                backgroundColor: '#0099ff',
+              },
+            }}
+          />
+        )}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: BACKGROUND_MAIN,
+  },
+});
 
 export default ChatScreen;

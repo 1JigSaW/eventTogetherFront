@@ -2,11 +2,13 @@ import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import {UserFavourite, UserFavouriteApi} from '../api/favourite.api';
 
 export const ADD_USER_FAVOURITE_QUERY_KEY = 'add_user_favourite';
+export const REMOVE_USER_FAVOURITE_QUERY_KEY = 'remove_user_favourite';
 export const GET_USER_FAVOURITES_QUERY_KEY = 'get_user_favourites';
 export const GET_EVENT_QUERY_KEY = 'get_event';
 
 export const useAddUserFavourite = () => {
   return useMutation<UserFavourite, Error, UserFavourite>(
+    [ADD_USER_FAVOURITE_QUERY_KEY],
     (favouriteData: UserFavourite) =>
       UserFavouriteApi.addUserFavourite(favouriteData),
     {
@@ -31,6 +33,7 @@ export const useGetUserFavourites = (userId: number | null) => {
 
 export const useRemoveUserFavourite = () => {
   return useMutation<void, Error, UserFavourite>(
+    [REMOVE_USER_FAVOURITE_QUERY_KEY],
     (favouriteData: UserFavourite) =>
       UserFavouriteApi.removeUserFavourite(favouriteData),
     {

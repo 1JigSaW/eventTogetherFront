@@ -1,5 +1,4 @@
 import {API} from './API';
-import { UserProfileData } from "./userprofile";
 
 export interface Attendee {
   id: number;

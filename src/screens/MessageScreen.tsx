@@ -5,7 +5,7 @@ import {useUserChats} from '../queries/chat';
 import {UserContext} from '../../App';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
-import {Bold, Regular} from '../../fonts';
+import { Black, Bold, Regular, SemiBold } from "../../fonts";
 import ProfileIcon from '../components/icons/ProfileIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'MessageScreen'>;
@@ -43,14 +43,16 @@ function MessageScreen({navigation}: Props) {
                 chat: message.chat.id,
               })
             }>
-            <Text style={styles.textEvent}>{message.chat.event.title}</Text>
+            <Text style={[styles.textEvent, {fontFamily: Black}]}>{message.chat.event.title}</Text>
             {message.chat.user1.id !== userProfile ? (
               <Text style={styles.textEvent}>
-                {message.chat.user1.first_name} {message.chat.user1.last_name}
+                To: {message.chat.user1.first_name}{' '}
+                {message.chat.user1.last_name}
               </Text>
             ) : (
               <Text style={styles.textEvent}>
-                {message.chat.user2.first_name} {message.chat.user2.last_name}
+                To: {message.chat.user2.first_name}{' '}
+                {message.chat.user2.last_name}
               </Text>
             )}
             <View style={styles.row}>
@@ -107,10 +109,9 @@ const styles = StyleSheet.create({
     color: BLACK_MAIN,
   },
   textEvent: {
-    fontFamily: Regular,
+    fontFamily: SemiBold,
     fontSize: 15,
     color: BLACK_MAIN,
-    marginBottom: 6,
   },
 });
 

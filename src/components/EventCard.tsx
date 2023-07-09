@@ -28,6 +28,7 @@ import {
 import {UserContext} from '../../App';
 import {useAddUserToEvent, useRemoveUserFromEvent} from '../queries/event';
 import CloseIcon from './icons/CloseIcon';
+import {useFocusEffect} from '@react-navigation/native';
 
 const EventCard = ({item, navigation}: any) => {
   const {user, userProfileExist, userProfile} = useContext(UserContext);
@@ -51,7 +52,7 @@ const EventCard = ({item, navigation}: any) => {
     );
   }, [item.awaiting_invite, userProfile]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (userFavourites) {
       const favouriteIds = userFavourites.map(fav => fav.favourite_event);
       setIsFavourite(favouriteIds.includes(item.id));
@@ -133,7 +134,9 @@ const EventCard = ({item, navigation}: any) => {
     return <Text>Error loading favourites...</Text>;
   }
   return (
-    <View style={styles.whiteBlock}>
+    <Pressable
+      style={styles.whiteBlock}
+      onPress={() => navigation.navigate('EventScreen', {event: item.id})}>
       <View style={styles.topPart}>
         <View style={styles.leftPart}>
           <Image
@@ -206,7 +209,7 @@ const EventCard = ({item, navigation}: any) => {
           )}
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

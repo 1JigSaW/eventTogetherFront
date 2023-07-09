@@ -14,6 +14,7 @@ import AccountScreen from '../screens/AccountScreen';
 import WaitingScreen from '../screens/WaitingScreen';
 import MessageScreen from '../screens/MessageScreen';
 import ChatScreen from '../screens/ChatScreen';
+import EventScreen from "../screens/EventScreen";
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -36,6 +37,9 @@ export type HomeStackParamList = {
     chat?: number;
     user?: number | null;
     event?: number;
+  };
+  EventScreen: {
+    event: number;
   };
 };
 
@@ -194,7 +198,32 @@ function HomeStack() {
         name={'ChatScreen'}
         component={ChatScreen}
         options={({navigation}) => ({
-          headerTitle: 'Chat',
+          headerStyle: {
+            backgroundColor: BACKGROUND_MAIN,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTitleStyle: {
+            textAlign: 'center',
+          },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+                <MessagesIcon size={100} style={styles.headerRightOne} />
+              </Pressable>
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <FavouritesIcon size={100} />
+              </Pressable>
+            </View>
+          ),
+        })}
+      />
+      <HomeStackNavigator.Screen
+        name={'EventScreen'}
+        component={EventScreen}
+        options={({navigation}) => ({
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
             borderBottomWidth: 0,
