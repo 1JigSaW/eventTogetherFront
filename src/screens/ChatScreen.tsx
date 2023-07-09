@@ -5,18 +5,18 @@ import {queryClient, UserContext} from '../../App';
 import {
   CHAT_MESSAGES_QUERY_KEY,
   useChatMessages,
-  useCreateChat, useGetChatId,
-  useSendMessage
-} from "../queries/chat";
+  useCreateChat,
+  useGetChatId,
+  useSendMessage,
+} from '../queries/chat';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
-import {Text} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MessageData} from '../api/chat.api';
 
 type Props = StackScreenProps<HomeStackParamList, 'ChatScreen'>;
 
 type PostMessage = {
-  _id?: number;
+  _id: number | string;
   text: string;
   createdAt: Date;
   user: {
@@ -37,45 +37,22 @@ const ChatScreen = ({route}: Props) => {
   const [messages, setMessages] = useState<PostMessage[]>([]);
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [chatId, setChatId] = useState<any>(chat); // Initialize chatId with initialChat
+  console.log(userProfile, tempUser, event, chat);
 
-  const {
-    data: chatIdData,
-    isLoading: chatIdLoading,
-    isError: chatIdError,
-  } = useGetChatId(userProfile, tempUser, event);
+  const {data: chatIdData} = useGetChatId(userProfile, tempUser, event);
 
   useEffect(() => {
     if (chatIdData) {
       setChatId(chatIdData);
     }
   }, [chatIdData]);
-
-  const {data: messagesData, isLoading, isError} = useChatMessages(chatId);
-
-  // useEffect(() => {
-  //   if (!chatId) {
-  //     createChatMutation.mutate(
-  //       {sender: userProfile, recipient: tempUser, event: event},
-  //       {
-  //         onSuccess: data => {
-  //           if (Array.isArray(data)) {
-  //             // If server returned messages, it means the chat already exists
-  //             setChatId(data[0].chat); // Update chatId with the existing chat's id
-  //           } else {
-  //             // If server returned a new chat
-  //             setChatId(data.id); // Update chatId with the new chat's id
-  //           }
-  //         },
-  //       },
-  //     );
-  //   }
-  // }, [chatId, createChatMutation, event, tempUser, userProfile]);
+  const {data: messagesData} = useChatMessages(chatId);
 
   useEffect(() => {
     if (messagesData) {
       const formattedMessages = messagesData
         .map((m: MessageData) => ({
-          _id: m.id,
+          _id: m.id || '',
           text: m.content,
           createdAt: new Date(m.timestamp),
           user: {
@@ -91,7 +68,7 @@ const ChatScreen = ({route}: Props) => {
   }, [messagesData, setMessages, userProfile]);
 
   const onSend = (messages: {text: string}[] = []) => {
-    if (isFirstMessage && !chat) {
+    if (isFirstMessage && !chat && userProfile && tempUser && event) {
       createChatMutation.mutate(
         {sender: userProfile, recipient: tempUser, event: event},
         {
@@ -123,7 +100,7 @@ const ChatScreen = ({route}: Props) => {
   };
 
   // This is a helper function to send and append messages
-  const sendAndAppendMessage = messageData => {
+  const sendAndAppendMessage = (messageData: any) => {
     const newMessage: any = {
       _id: Math.random().toString(),
       text: messageData.content,
@@ -172,7 +149,7 @@ const ChatScreen = ({route}: Props) => {
         })) as IMessage[]
       }
       onSend={messages => onSend(messages)}
-      user={{_id: userProfile}}
+      user={{_id: userProfile !== null ? userProfile : 0}}
       renderBubble={props => (
         <Bubble
           {...props}

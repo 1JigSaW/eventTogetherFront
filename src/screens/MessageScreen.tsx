@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from "react";
+import React, {useCallback, useContext, useEffect} from 'react';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useUserChats} from '../queries/chat';
@@ -44,9 +44,15 @@ function MessageScreen({navigation}: Props) {
               })
             }>
             <Text style={styles.textEvent}>{message.chat.event.title}</Text>
-            <Text style={styles.textEvent}>
-              {message.chat.user1.first_name} {message.chat.user1.last_name}
-            </Text>
+            {message.chat.user1.id !== userProfile ? (
+              <Text style={styles.textEvent}>
+                {message.chat.user1.first_name} {message.chat.user1.last_name}
+              </Text>
+            ) : (
+              <Text style={styles.textEvent}>
+                {message.chat.user2.first_name} {message.chat.user2.last_name}
+              </Text>
+            )}
             <View style={styles.row}>
               <ProfileIcon size={100} />
               <View style={styles.messageBlock}>

@@ -90,20 +90,23 @@ export class ChatApi {
   }
 
   static async getChatId(
-    senderId: number,
-    recipientId: number,
-    eventId: number,
+    sender: number,
+    recipient: number,
+    event: number,
   ): Promise<number> {
     try {
       const {data} = await API.get('/api/get_chat_id/', {
         params: {
-          senderUserId: senderId,
-          recipientUserId: recipientId,
-          eventId: eventId,
+          senderUserId: sender,
+          recipientUserId: recipient,
+          eventId: event,
         },
       });
       return data.chat_id;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        throw error;
+      }
       throw error;
     }
   }

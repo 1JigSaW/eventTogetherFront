@@ -59,9 +59,9 @@ export const useCreateChat = () => {
 };
 
 export const useGetChatId = (
-  senderId: number,
-  recipientId: number,
-  eventId: number,
+  senderId: number | null,
+  recipientId: number | null | undefined,
+  eventId: number | undefined
 ) => {
   return useQuery<number, AxiosError>(
     ['get_chat_id', {senderId, recipientId, eventId}],
