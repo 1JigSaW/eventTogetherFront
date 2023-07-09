@@ -20,6 +20,7 @@ const WaitingScreen = ({navigation, route}: Props) => {
   const {event} = route.params;
   const {user} = useContext(UserContext);
   const {data: attendees, isLoading, error} = useEventProfiles(event);
+  console.log(attendees?.pages[0].results);
 
   const allAttendees = attendees?.pages.flatMap(page => page.results) || [];
 
@@ -74,7 +75,8 @@ const WaitingScreen = ({navigation, route}: Props) => {
             style={styles.buttonInvite}
             onPress={() =>
               navigation.navigate('ChatScreen', {
-                recipientUserId: item.user,
+                user: item.id,
+                event: event,
               })
             }>
             <Text style={styles.textAddition}>Invite</Text>

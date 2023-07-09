@@ -5,8 +5,9 @@ import {queryClient, UserContext} from '../../App';
 import {
   CHAT_MESSAGES_QUERY_KEY,
   useChatMessages,
-  useSendMessage,
-} from '../queries/chat';
+  useCreateChat, useGetChatId,
+  useSendMessage
+} from "../queries/chat";
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Text} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -27,13 +28,48 @@ type PostMessage = {
 };
 
 const ChatScreen = ({route}: Props) => {
-  const {chat, recipientUserId} = route.params;
+  const {chat, user: tempUser, event} = route.params;
   const {userProfile} = useContext(UserContext);
   const socket = SocketIOClient('http://localhost:3000'); // Replace with your server address
-  const {data: messagesData, isLoading, isError} = useChatMessages(chat);
   const sendMessageMutation = useSendMessage();
+  const createChatMutation = useCreateChat();
 
   const [messages, setMessages] = useState<PostMessage[]>([]);
+  const [isFirstMessage, setIsFirstMessage] = useState(true);
+  const [chatId, setChatId] = useState<any>(chat); // Initialize chatId with initialChat
+
+  const {
+    data: chatIdData,
+    isLoading: chatIdLoading,
+    isError: chatIdError,
+  } = useGetChatId(userProfile, tempUser, event);
+
+  useEffect(() => {
+    if (chatIdData) {
+      setChatId(chatIdData);
+    }
+  }, [chatIdData]);
+
+  const {data: messagesData, isLoading, isError} = useChatMessages(chatId);
+
+  // useEffect(() => {
+  //   if (!chatId) {
+  //     createChatMutation.mutate(
+  //       {sender: userProfile, recipient: tempUser, event: event},
+  //       {
+  //         onSuccess: data => {
+  //           if (Array.isArray(data)) {
+  //             // If server returned messages, it means the chat already exists
+  //             setChatId(data[0].chat); // Update chatId with the existing chat's id
+  //           } else {
+  //             // If server returned a new chat
+  //             setChatId(data.id); // Update chatId with the new chat's id
+  //           }
+  //         },
+  //       },
+  //     );
+  //   }
+  // }, [chatId, createChatMutation, event, tempUser, userProfile]);
 
   useEffect(() => {
     if (messagesData) {
@@ -52,18 +88,44 @@ const ChatScreen = ({route}: Props) => {
         .reverse();
       setMessages(formattedMessages);
     }
-  }, [messagesData, userProfile]);
+  }, [messagesData, setMessages, userProfile]);
 
   const onSend = (messages: {text: string}[] = []) => {
-    const messageData = {
-      chat: chat,
-      sender: userProfile,
-      content: messages[0].text,
-      timestamp: new Date().toISOString(),
-    };
+    if (isFirstMessage && !chat) {
+      createChatMutation.mutate(
+        {sender: userProfile, recipient: tempUser, event: event},
+        {
+          onSuccess: data => {
+            const chatId = data.id; // Получаем chat.id из результата
 
+            const messageData = {
+              chat: chatId,
+              sender: userProfile,
+              content: messages[0].text,
+              timestamp: new Date().toISOString(),
+            };
+
+            sendAndAppendMessage(messageData);
+            setIsFirstMessage(false);
+          },
+        },
+      );
+    } else {
+      const messageData = {
+        chat: route.params.chat,
+        sender: userProfile,
+        content: messages[0].text,
+        timestamp: new Date().toISOString(),
+      };
+
+      sendAndAppendMessage(messageData);
+    }
+  };
+
+  // This is a helper function to send and append messages
+  const sendAndAppendMessage = messageData => {
     const newMessage: any = {
-      _id: Math.random().toString(), // temporary ID before the real one is returned from the server
+      _id: Math.random().toString(),
       text: messageData.content,
       createdAt: new Date(messageData.timestamp),
       user: {
@@ -73,6 +135,7 @@ const ChatScreen = ({route}: Props) => {
       sent: true,
       received: false,
     };
+
     setMessages((previousMessages): any =>
       GiftedChat.append(previousMessages, newMessage),
     );
@@ -82,7 +145,7 @@ const ChatScreen = ({route}: Props) => {
         setMessages(previousMessages =>
           previousMessages.map(message =>
             message._id === newMessage._id
-              ? {...message, _id: data.id as number} // Use type assertion to explicitly set _id as number
+              ? {...message, _id: data.id as number}
               : message,
           ),
         );
@@ -95,13 +158,6 @@ const ChatScreen = ({route}: Props) => {
       queryClient.invalidateQueries([CHAT_MESSAGES_QUERY_KEY, chat]);
     });
   }, [chat, socket]);
-
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
-  if (isError) {
-    return <Text>Error loading messages</Text>;
-  }
 
   return (
     <GiftedChat

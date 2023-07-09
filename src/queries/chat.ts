@@ -21,16 +21,16 @@ export const useSendMessage = () => {
   );
 };
 
-export const useChatMessages = (chatId: number | null) => {
+export const useChatMessages = (chatId: number) => {
   return useQuery<MessageData[], AxiosError>(
     [CHAT_MESSAGES_QUERY_KEY, chatId],
     () => ChatApi.getChatMessages(chatId),
     {
       retry: 0,
+      enabled: !!chatId,
     },
   );
 };
-
 
 export const useUserChats = (userId: number | null) => {
   return useQuery<MessageData[], AxiosError>(
@@ -42,14 +42,32 @@ export const useUserChats = (userId: number | null) => {
   );
 };
 
-
 export const useCreateChat = () => {
-  return useMutation<any, AxiosError, number>(
-    (recipientUserId: number) => ChatApi.createChat(recipientUserId),
+  return useMutation<
+    any,
+    AxiosError,
+    {sender: number; recipient: number; event: number}
+  >(
+    (chatData: {sender: number; recipient: number; event: number}) =>
+      ChatApi.createChat(chatData),
     {
       onError: error => {
         console.error(error);
       },
+    },
+  );
+};
+
+export const useGetChatId = (
+  senderId: number,
+  recipientId: number,
+  eventId: number,
+) => {
+  return useQuery<number, AxiosError>(
+    ['get_chat_id', {senderId, recipientId, eventId}],
+    () => ChatApi.getChatId(senderId, recipientId, eventId),
+    {
+      retry: 0,
     },
   );
 };

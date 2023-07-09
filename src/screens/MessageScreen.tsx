@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useCallback, useContext, useEffect } from "react";
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useUserChats} from '../queries/chat';
@@ -12,9 +12,17 @@ type Props = StackScreenProps<HomeStackParamList, 'MessageScreen'>;
 
 function MessageScreen({navigation}: Props) {
   const {userProfile} = useContext(UserContext);
-  const {data: messages, isLoading, error} = useUserChats(userProfile);
-  console.log(messages);
+  const {data: messages, isLoading, error, refetch} = useUserChats(userProfile);
 
+  const onScreenFocus = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', onScreenFocus);
+
+    return unsubscribe;
+  }, [navigation, onScreenFocus]);
   if (isLoading) {
     return <Text>Loading...</Text>;
   }
@@ -36,6 +44,9 @@ function MessageScreen({navigation}: Props) {
               })
             }>
             <Text style={styles.textEvent}>{message.chat.event.title}</Text>
+            <Text style={styles.textEvent}>
+              {message.chat.user1.first_name} {message.chat.user1.last_name}
+            </Text>
             <View style={styles.row}>
               <ProfileIcon size={100} />
               <View style={styles.messageBlock}>

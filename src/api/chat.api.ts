@@ -1,10 +1,12 @@
 import {API} from './API';
+import {UserProfileData} from './userprofile';
 
 export interface Chat {
+  sender: any;
   id: number;
   event: Event;
-  user1: number;
-  user2: number;
+  user1: UserProfileData;
+  user2: UserProfileData;
 }
 
 export interface Sender {
@@ -33,6 +35,7 @@ export interface Event {
 }
 
 export interface MessageData {
+  recipient: any;
   id?: number;
   chat: Chat;
   content: string;
@@ -51,7 +54,7 @@ export class ChatApi {
     }
   }
 
-  static async getChatMessages(chatId: number | null): Promise<MessageData[]> {
+  static async getChatMessages(chatId: number): Promise<MessageData[]> {
     try {
       const {data} = await API.get(`/api/chat/${chatId}/messages/`);
       return data;
@@ -69,12 +72,37 @@ export class ChatApi {
     }
   }
 
-  static async createChat(recipientUserId: number): Promise<any> {
+  static async createChat(chatData: {
+    sender: number;
+    recipient: number;
+    event: number;
+  }): Promise<any> {
     try {
       const {data} = await API.post('/api/chat/create/', {
-        recipientUserId: recipientUserId,
+        senderUserId: chatData.sender,
+        recipientUserId: chatData.recipient,
+        eventId: chatData.event,
       });
       return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async getChatId(
+    senderId: number,
+    recipientId: number,
+    eventId: number,
+  ): Promise<number> {
+    try {
+      const {data} = await API.get('/api/get_chat_id/', {
+        params: {
+          senderUserId: senderId,
+          recipientUserId: recipientId,
+          eventId: eventId,
+        },
+      });
+      return data.chat_id;
     } catch (error) {
       throw error;
     }

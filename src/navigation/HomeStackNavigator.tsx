@@ -34,7 +34,8 @@ export type HomeStackParamList = {
   MessageScreen: undefined;
   ChatScreen: {
     chat?: number;
-    recipientUserId?: number | null;
+    user?: number | null;
+    event?: number;
   };
 };
 
