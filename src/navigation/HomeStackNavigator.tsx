@@ -14,7 +14,8 @@ import AccountScreen from '../screens/AccountScreen';
 import WaitingScreen from '../screens/WaitingScreen';
 import MessageScreen from '../screens/MessageScreen';
 import ChatScreen from '../screens/ChatScreen';
-import EventScreen from "../screens/EventScreen";
+import EventScreen from '../screens/EventScreen';
+import FindSwipeScreen from "../screens/FindSwipeScreen";
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -39,6 +40,9 @@ export type HomeStackParamList = {
     event?: number;
   };
   EventScreen: {
+    event: number;
+  };
+  FindSwipeScreen: {
     event: number;
   };
 };
@@ -245,6 +249,10 @@ function HomeStack() {
             </View>
           ),
         })}
+      />
+      <HomeStackNavigator.Screen
+        name={'FindSwipeScreen'}
+        component={FindSwipeScreen}
       />
     </HomeStackNavigator.Navigator>
   );

@@ -18,7 +18,7 @@ import SearchIcon from '../components/icons/SearchIcon';
 import {useEvents, useSearchEvents} from '../queries/event';
 import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';
-import { useFocusEffect } from "@react-navigation/native";
+import {useFocusEffect} from '@react-navigation/native';
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 

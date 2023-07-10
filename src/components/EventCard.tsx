@@ -198,9 +198,9 @@ const EventCard = ({item, navigation}: any) => {
             )}
           </Pressable>
         </View>
-        <View style={styles.find}>
+        <Pressable style={styles.find} onPress={() => navigation.navigate('FindSwipeScreen', {event: item.id})}>
           <Text style={styles.findText}>Find someone to go with</Text>
-        </View>
+        </Pressable>
         <Pressable style={styles.row} onPress={handleAddToFavourite}>
           {!isFavourite ? (
             <HeartIcon size={100} color={RED_MAIN} />

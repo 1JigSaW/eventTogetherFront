@@ -7,7 +7,15 @@ import {
   useRemoveUserFavourite,
 } from '../queries/favourite';
 import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {Event} from '../api/event.api';
 import {
   BACKGROUND_MAIN,
@@ -18,18 +26,23 @@ import {
   WHITE_MAIN,
 } from '../../colors';
 import {Bold, Regular, SemiBold} from '../../fonts';
-import {useEventProfiles} from '../queries/event';
+import {
+  useAddUserToEvent,
+  useEventProfiles,
+  useRemoveUserFromEvent,
+} from '../queries/event';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import AddIcon from '../components/icons/AddIcon';
 import HeartIcon from '../components/icons/HeartIcon';
 import {queryClient, UserContext} from '../../App';
 import {useFocusEffect} from '@react-navigation/native';
+import RemoveIcon from '../components/icons/RemoveIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'EventScreen'>;
 
 const EventScreen = ({navigation, route}: Props) => {
   const eventId = route.params.event;
-  const {user} = useContext(UserContext);
+  const {user, userProfileExist, userProfile} = useContext(UserContext);
   const [eventData, setEventData] = useState<Event | null>(null);
   const [isFavourite, setIsFavourite] = useState(false);
 
@@ -39,6 +52,11 @@ const EventScreen = ({navigation, route}: Props) => {
   const removeUserFavourite = useRemoveUserFavourite();
 
   const {data: userFavourites} = useGetUserFavourites(user);
+
+  const addUserToEventMutation = useAddUserToEvent();
+  const removeUserFromEventMutation = useRemoveUserFromEvent();
+
+  const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
 
   const allAttendees = (
     attendees?.pages.flatMap(page => page.results) || []
@@ -57,6 +75,14 @@ const EventScreen = ({navigation, route}: Props) => {
       setEventData(data as Event);
     }
   }, [data]);
+
+  useEffect(() => {
+    setAwaitingInvite(
+      eventData?.awaiting_invite?.some((invite: number | null) => {
+        return invite === userProfile;
+      }) || false,
+    );
+  }, [eventData?.awaiting_invite, userProfile]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -88,6 +114,52 @@ const EventScreen = ({navigation, route}: Props) => {
           },
         },
       );
+    }
+  };
+
+  const handleAddWait = () => {
+    if (!userProfileExist) {
+      Alert.alert('Profile not found', 'Create your profile first', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Go to Profile',
+          onPress: () => {
+            navigation.navigate('AccountScreen');
+          },
+        },
+      ]);
+      return;
+    } else {
+      if (awaitingInvite) {
+        removeUserFromEventMutation.mutate(
+          {
+            eventId: eventId,
+            userId: user,
+          },
+          {
+            onSuccess: () => {
+              setAwaitingInvite(false);
+              queryClient.invalidateQueries(['useEventProfilesQueryKey']);
+            },
+          },
+        );
+      } else {
+        addUserToEventMutation.mutate(
+          {
+            eventId: eventId,
+            userId: user,
+          },
+          {
+            onSuccess: () => {
+              setAwaitingInvite(true);
+              queryClient.invalidateQueries(['useEventProfilesQueryKey']);
+            },
+          },
+        );
+      }
     }
   };
 
@@ -136,18 +208,35 @@ const EventScreen = ({navigation, route}: Props) => {
         )}
         <Text style={styles.title1}>Attendees:</Text>
         <View style={styles.attendeesBlock}>
-          {allAttendees.map((attendee, index) => (
-            <View key={index} style={styles.oneAttend}>
-              <ProfileIcon size={150} />
-              <Text style={styles.name}>
-                {attendee.first_name} {attendee.last_name}
-              </Text>
-            </View>
-          ))}
-          <View style={{alignItems: 'center'}}>
-            <AddIcon size={300} color={BLUE_MAIN} />
-            <Text style={styles.add}>Add</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {allAttendees.map((attendee, index) => (
+              <View key={index} style={styles.oneAttend}>
+                <ProfileIcon size={140} />
+              </View>
+            ))}
+            <Pressable
+              style={{alignItems: 'center', marginLeft: 4}}
+              onPress={handleAddWait}>
+              {!awaitingInvite ? (
+                <AddIcon size={300} color={BLACK_MAIN} />
+              ) : (
+                <RemoveIcon size={300} color={BLACK_MAIN} />
+              )}
+            </Pressable>
           </View>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('WaitingScreen', {event: eventId})
+            }
+            style={{
+              width: '95%',
+              alignItems: 'center',
+              marginTop: 6,
+              borderWidth: 1,
+              borderRadius: 15,
+            }}>
+            <Text style={styles.allUsers}>See all</Text>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -179,7 +268,6 @@ const styles = StyleSheet.create({
   },
   attendeesBlock: {
     marginTop: 4,
-    flexDirection: 'row',
     backgroundColor: WHITE_MAIN,
     alignItems: 'center',
     padding: 8,
@@ -231,6 +319,11 @@ const styles = StyleSheet.create({
     fontFamily: SemiBold,
     marginLeft: 4,
     alignSelf: 'center',
+  },
+  allUsers: {
+    color: BLACK_MAIN,
+    fontSize: 16,
+    fontFamily: Regular,
   },
 });
 
