@@ -198,7 +198,7 @@ const EventCard = ({item, navigation}: any) => {
             )}
           </Pressable>
         </View>
-        <Pressable style={styles.find} onPress={() => navigation.navigate('FindSwipeScreen', {event: item.id})}>
+        <Pressable style={styles.find} onPress={() => navigation.navigate('FindSwipeScreen', {event: item.id, item: item})}>
           <Text style={styles.findText}>Find someone to go with</Text>
         </Pressable>
         <Pressable style={styles.row} onPress={handleAddToFavourite}>
