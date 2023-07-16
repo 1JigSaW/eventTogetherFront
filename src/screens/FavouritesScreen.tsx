@@ -51,9 +51,14 @@ const FavouritesScreen = ({navigation}: Props) => {
     <ScrollView style={styles.container}>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
       <View style={styles.insideBlock}>
-        {events.map((event: Event, index: number) => (
-          <EventCard key={index} item={event} navigation={navigation} />
-        ))}
+        {Array.isArray(events) &&
+          events.length > 0 ? (
+          events.map((event: Event, index: number) => (
+            <EventCard key={index} item={event} navigation={navigation} />
+          ))
+        ) : (
+          <Text>As long as you haven't added anything</Text>
+        )}
       </View>
     </ScrollView>
   );

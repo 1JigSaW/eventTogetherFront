@@ -3,9 +3,9 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useUserChats} from '../queries/chat';
 import {UserContext} from '../../App';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
-import { Black, Bold, Regular, SemiBold } from "../../fonts";
+import {Black, Bold, Regular, SemiBold} from '../../fonts';
 import ProfileIcon from '../components/icons/ProfileIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'MessageScreen'>;
@@ -13,6 +13,7 @@ type Props = StackScreenProps<HomeStackParamList, 'MessageScreen'>;
 function MessageScreen({navigation}: Props) {
   const {userProfile} = useContext(UserContext);
   const {data: messages, isLoading, error, refetch} = useUserChats(userProfile);
+  console.log(messages);
 
   const onScreenFocus = useCallback(() => {
     refetch();
@@ -43,7 +44,9 @@ function MessageScreen({navigation}: Props) {
                 chat: message.chat.id,
               })
             }>
-            <Text style={[styles.textEvent, {fontFamily: Black}]}>{message.chat.event.title}</Text>
+            <Text style={[styles.textEvent, {fontFamily: Black}]}>
+              {message.chat.event.title}
+            </Text>
             {message.chat.user1.id !== userProfile ? (
               <Text style={styles.textEvent}>
                 To: {message.chat.user1.first_name}{' '}
@@ -56,7 +59,30 @@ function MessageScreen({navigation}: Props) {
               </Text>
             )}
             <View style={styles.row}>
-              <ProfileIcon size={100} />
+              {message.chat.user1.id === userProfile ? (
+                message.chat.user2.image ? (
+                  <Image
+                    source={{
+                      uri: message.chat.user2.image?.replace(
+                        'image/upload/',
+                        '',
+                      ),
+                    }}
+                    style={{width: 40, height: 40, borderRadius: 125}}
+                  />
+                ) : (
+                  <ProfileIcon size={100} />
+                )
+              ) : message.chat.user1.image ? (
+                <Image
+                  source={{
+                    uri: message.chat.user1.image?.replace('image/upload/', ''),
+                  }}
+                  style={{width: 40, height: 40, borderRadius: 125}}
+                />
+              ) : (
+                <ProfileIcon size={100} />
+              )}
               <View style={styles.messageBlock}>
                 <Text style={styles.textName}>
                   {message.sender.first_name} {message.sender.last_name}

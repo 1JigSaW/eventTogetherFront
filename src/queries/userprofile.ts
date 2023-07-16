@@ -41,3 +41,18 @@ export const useUserProfileDetail = (userId: number | null) => {
   );
 };
 
+export const useUpdateUserProfilePicture = () => {
+  return useMutation<
+    {success: boolean},
+    AxiosError,
+    {userProfileId: number | null; picture: string | undefined}
+  >(
+    ({userProfileId, picture}) =>
+      UserProfileApi.updateUserProfilePicture(userProfileId, picture),
+    {
+      onError: error => {
+        console.error(error);
+      },
+    },
+  );
+};

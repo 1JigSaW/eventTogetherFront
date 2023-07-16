@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {UserContext} from '../../App';
-import { FlatList, ListRenderItem, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, ListRenderItem, Pressable, StyleSheet, Text, View } from "react-native";
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
@@ -27,11 +27,19 @@ const WaitingScreen = ({navigation, route}: Props) => {
   const renderItem: ListRenderItem<UserProfileData> = ({item}) => {
     const languages = item.language.map(lang => lang).join(', ');
     const interests = item.interests.map(inter => inter).join(', ');
+    let image_url = item.image?.replace('image/upload/', '');
     return (
       <View style={styles.block}>
         <View style={styles.row}>
           <View>
-            <ProfileIcon size={200} />
+            {!item.image ? (
+              <ProfileIcon size={200} />
+            ) : (
+              <Image
+                source={{uri: image_url}}
+                style={{width: 80, height: 80, borderRadius: 125}}
+              />
+            )}
           </View>
           <View style={{flex: 1, marginLeft: 8}}>
             <View style={[styles.row]}>

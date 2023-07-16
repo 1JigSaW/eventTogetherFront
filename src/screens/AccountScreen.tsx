@@ -1,6 +1,8 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {
+  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -27,6 +29,7 @@ import {CustomSelector} from '../components/CustomSelector';
 import {useSearchLanguages} from '../queries/language';
 import {
   useUpdateUserProfile,
+  useUpdateUserProfilePicture,
   useUserProfileDetail,
 } from '../queries/userprofile';
 import {UserContext} from '../../App';
@@ -34,6 +37,17 @@ import {useChangePassword} from '../queries/user';
 import {UserProfileData} from '../api/userprofile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from '../../constants';
+import {
+  launchImageLibrary,
+  MediaType,
+  PhotoQuality,
+} from 'react-native-image-picker';
+import {
+  Permission,
+  PERMISSIONS,
+  PermissionStatus,
+  request,
+} from 'react-native-permissions';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
@@ -61,6 +75,8 @@ const AccountScreen = ({navigation}: Props) => {
   const [ageTouched, setAgeTouched] = useState(false);
   const [languagesTouched, setLanguagesTouched] = useState(false);
   const [interestsTouched, setInterestsTouched] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [pickedImage, setPickedImage] = useState<string | null>(null);
 
   const [originalProfileData, setOriginalProfileData] =
     useState<UserProfileData | null>(null);
@@ -68,10 +84,17 @@ const AccountScreen = ({navigation}: Props) => {
   const userProfileDetailQuery = useUserProfileDetail(user);
   const updateUserProfileMutation = useUpdateUserProfile();
   const changePasswordMutation = useChangePassword();
+  const updateUserProfilePicture = useUpdateUserProfilePicture();
 
   useEffect(() => {
     if (userProfileDetailQuery.data) {
       const profileData = userProfileDetailQuery.data;
+      if (profileData.image) {
+        let image_url = profileData.image.replace('image/upload/', '');
+        setPhoto(image_url);
+        console.log(image_url);
+      }
+      console.log(photo);
       setFirstName(profileData.first_name);
       setSecondName(profileData.last_name);
       setAge(String(profileData.age));
@@ -80,7 +103,7 @@ const AccountScreen = ({navigation}: Props) => {
       setSelectedInterests(profileData.interests);
       setOriginalProfileData(profileData);
     }
-  }, [userProfileDetailQuery.data]);
+  }, [photo, userProfileDetailQuery.data]);
 
   const validateForm = () => {
     let valid = true;
@@ -177,6 +200,62 @@ const AccountScreen = ({navigation}: Props) => {
     navigation.navigate('SignInScreen');
   }
 
+  const requestStoragePermission = async () => {
+    try {
+      let permission: Permission | undefined;
+      if (Platform.OS === 'android') {
+        permission = PERMISSIONS.ANDROID.READ_MEDIA_IMAGES;
+      } else if (Platform.OS === 'ios') {
+        permission = PERMISSIONS.IOS.PHOTO_LIBRARY;
+      }
+
+      if (permission) {
+        console.log('Requesting permission...');
+        const result: PermissionStatus = await request(permission);
+        console.log('Permission result:', result);
+
+        if (result === 'granted') {
+          pickImage();
+        } else {
+          Alert.alert(
+            'Permission Required',
+            'Please grant permission to access photo library.',
+          );
+        }
+      }
+    } catch (error) {
+      console.error('handleOpenFromLibrary error:', error);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      let options = {
+        mediaType: 'photo' as MediaType,
+        includeBase64: true,
+        maxWidth: 300,
+        maxHeight: 300,
+        quality: 1 as PhotoQuality,
+      };
+      await launchImageLibrary(options, response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorMessage) {
+          console.log('ImagePicker Error: ', response.errorMessage);
+        } else if (response.assets && response.assets[0].uri) {
+          const source = {uri: response.assets[0].uri};
+          setPickedImage(source.uri);
+          updateUserProfilePicture.mutate({
+            userProfileId: user,
+            picture: response.assets[0].base64,
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -198,9 +277,23 @@ const AccountScreen = ({navigation}: Props) => {
               </Text>
             )}
             <View style={styles.insideBlock}>
-              <View style={styles.profileBlock}>
-                <ProfileIcon size={250} />
-              </View>
+              <Pressable
+                style={styles.profileBlock}
+                onPress={requestStoragePermission}>
+                {pickedImage ? (
+                  <Image
+                    source={{uri: pickedImage}}
+                    style={{width: 250, height: 250, borderRadius: 125}}
+                  />
+                ) : photo ? (
+                  <Image
+                    source={{uri: photo}}
+                    style={{width: 250, height: 250, borderRadius: 125}}
+                  />
+                ) : (
+                  <ProfileIcon size={250} />
+                )}
+              </Pressable>
               <View>
                 <Text style={styles.infoText}>Info:</Text>
                 <TextInput

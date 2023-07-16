@@ -90,9 +90,9 @@ export class ChatApi {
   }
 
   static async getChatId(
-    sender: number,
-    recipient: number,
-    event: number,
+    sender: number | null,
+    recipient: number | null | undefined,
+    event: number | undefined
   ): Promise<number> {
     try {
       const {data} = await API.get('/api/get_chat_id/', {

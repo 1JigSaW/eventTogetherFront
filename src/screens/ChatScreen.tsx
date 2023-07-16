@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useLayoutEffect } from "react";
+import React, {useEffect, useContext, useState, useLayoutEffect} from 'react';
 import {Bubble, GiftedChat, IMessage} from 'react-native-gifted-chat';
 import SocketIOClient from 'socket.io-client';
 import {queryClient, UserContext} from '../../App';
@@ -12,8 +12,8 @@ import {
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MessageData} from '../api/chat.api';
-import { Dimensions, StyleSheet, View } from "react-native";
-import { BACKGROUND_MAIN } from "../../colors";
+import {StyleSheet, View} from 'react-native';
+import {BACKGROUND_MAIN} from '../../colors';
 
 type Props = StackScreenProps<HomeStackParamList, 'ChatScreen'>;
 
@@ -86,7 +86,7 @@ const ChatScreen = ({navigation, route}: Props) => {
         {sender: userProfile, recipient: tempUser, event: event},
         {
           onSuccess: data => {
-            const chatId = data.id; // Получаем chat.id из результата
+            const chatId = data.id;
 
             const messageData = {
               chat: chatId,
@@ -101,8 +101,9 @@ const ChatScreen = ({navigation, route}: Props) => {
         },
       );
     } else {
+      console.log(chatId);
       const messageData = {
-        chat: route.params.chat,
+        chat: route.params.chat ? route.params.chat : chatId,
         sender: userProfile,
         content: messages[0].text,
         timestamp: new Date().toISOString(),
@@ -112,7 +113,6 @@ const ChatScreen = ({navigation, route}: Props) => {
     }
   };
 
-  // This is a helper function to send and append messages
   const sendAndAppendMessage = (messageData: any) => {
     const newMessage: any = {
       _id: Math.random().toString(),
@@ -120,7 +120,6 @@ const ChatScreen = ({navigation, route}: Props) => {
       createdAt: new Date(messageData.timestamp),
       user: {
         _id: messageData.sender,
-        // other user properties like name, avatar
       },
       sent: true,
       received: false,
@@ -148,7 +147,7 @@ const ChatScreen = ({navigation, route}: Props) => {
       queryClient.invalidateQueries([CHAT_MESSAGES_QUERY_KEY, chat]);
     });
   }, [chat, socket]);
-  const screenWidth = Dimensions.get('window').width;
+
   return (
     <View style={{flex: 1, width: '100%', backgroundColor: BACKGROUND_MAIN}}>
       <GiftedChat

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import {BLACK_MAIN, ORANGE_MAIN, WHITE_MAIN} from '../../colors';
 import {Regular} from '../../fonts';
 import LanguageIcon from './icons/LanguageIcon';
@@ -9,6 +9,19 @@ import DescriptionIcon from './icons/DescriptionIcon';
 
 const UserCard = ({user}: any) => (
   <View style={styles.userBlock}>
+    {user.image && (
+      <Image
+        source={{uri: user.image?.replace('image/upload/', '')}}
+        style={{
+          width: 160,
+          height: 160,
+          borderRadius: 125,
+          alignSelf: 'center',
+          marginTop: 5,
+          marginBottom: 5,
+        }}
+      />
+    )}
     <Text style={styles.firstNameText}>{user.first_name}</Text>
     <Text style={styles.firstNameText}>{user.last_name}</Text>
     <View style={styles.insideBlock}>

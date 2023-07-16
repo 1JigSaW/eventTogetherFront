@@ -1,15 +1,16 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
-import React, { useContext, useEffect, useState } from "react";
-import { queryClient, UserContext } from "../../App";
+import React, {useContext, useEffect, useState} from 'react';
+import {queryClient, UserContext} from '../../App';
 import UserCard from '../components/UserCard';
 import TinderCard from 'react-tinder-card';
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useMatchUsers} from '../queries/match';
 import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
-  BLUE_MAIN, ORANGE_MAIN,
+  BLUE_MAIN,
+  ORANGE_MAIN,
   RED_MAIN,
   WHITE_MAIN,
 } from '../../colors';
@@ -94,7 +95,12 @@ const FindSwipeScreen = ({route, navigation}: Props) => {
     return (
       <View style={styles.noMoreUsersContainer}>
         <Text style={styles.noMoreUsersText}>No more users</Text>
-        <Pressable style={[styles.emptyButton, awaitingInvite && {backgroundColor: ORANGE_MAIN}]} onPress={handleAddWait}>
+        <Pressable
+          style={[
+            styles.emptyButton,
+            awaitingInvite && {backgroundColor: ORANGE_MAIN},
+          ]}
+          onPress={handleAddWait}>
           {!awaitingInvite ? (
             <Text style={styles.textButton}>Wait for an invitation</Text>
           ) : (

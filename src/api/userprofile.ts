@@ -9,6 +9,7 @@ export interface UserProfileData {
   language: string[];
   interests: string[];
   description?: string;
+  image?: string | null;
 }
 
 export class UserProfileApi {
@@ -31,6 +32,21 @@ export class UserProfileApi {
   ): Promise<UserProfileData> {
     try {
       const {data} = await API.get(`/api/userprofile/${userId}/`);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateUserProfilePicture(
+    userProfileId: number | null,
+    picture: string | undefined,
+  ): Promise<{success: boolean}> {
+    try {
+      const {data} = await API.put(
+        `/api/userprofile/${userProfileId}/update_picture/`,
+        {picture},
+      );
       return data;
     } catch (error) {
       throw error;
