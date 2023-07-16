@@ -133,16 +133,20 @@ const EventCard = ({item, navigation}: any) => {
   if (isError) {
     return <Text>Error loading favourites...</Text>;
   }
+  console.log(item.image);
   return (
     <Pressable
       style={styles.whiteBlock}
       onPress={() => navigation.navigate('EventScreen', {event: item.id})}>
       <View style={styles.topPart}>
         <View style={styles.leftPart}>
-          <Image
-            style={styles.image}
-            source={{uri: 'https://www.brandsoftheworld.com/logo/dsf'}}
-          />
+          {item.image && (
+            <Image
+              style={styles.image}
+              source={{uri: item.image.replace('image/upload/', '')}}
+              resizeMode="contain"
+            />
+          )}
         </View>
         <View style={styles.rightPart}>
           <View style={styles.textRight}>
@@ -198,7 +202,11 @@ const EventCard = ({item, navigation}: any) => {
             )}
           </Pressable>
         </View>
-        <Pressable style={styles.find} onPress={() => navigation.navigate('FindSwipeScreen', {event: item.id, item: item})}>
+        <Pressable
+          style={styles.find}
+          onPress={() =>
+            navigation.navigate('FindSwipeScreen', {event: item.id, item: item})
+          }>
           <Text style={styles.findText}>Find someone to go with</Text>
         </Pressable>
         <Pressable style={styles.row} onPress={handleAddToFavourite}>
@@ -248,14 +256,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   leftPart: {
-    borderWidth: 1,
+    height: 85,
     width: 111,
     margin: 11,
     borderRadius: 15,
   },
   image: {
-    height: 85,
-    width: 111,
+    height: '100%',
+    width: '100%',
   },
   rightPart: {
     margin: 6,

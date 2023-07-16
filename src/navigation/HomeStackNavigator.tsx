@@ -2,8 +2,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SignInScreen from '../screens/SignInScreen';
-import React from 'react';
-import {Animated, Pressable, StyleSheet} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Animated, Image, Pressable, StyleSheet} from 'react-native';
 import View = Animated.View;
 import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
@@ -16,6 +16,9 @@ import MessageScreen from '../screens/MessageScreen';
 import ChatScreen from '../screens/ChatScreen';
 import EventScreen from '../screens/EventScreen';
 import FindSwipeScreen from '../screens/FindSwipeScreen';
+import {useUserProfileDetail} from '../queries/userprofile';
+import {UserContext} from '../../App';
+import {useFocusEffect} from '@react-navigation/native';
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -49,6 +52,26 @@ export type HomeStackParamList = {
 };
 
 function HomeStack() {
+  // const {user} = useContext(UserContext);
+  // const [photo, setPhoto] = useState<string | null>(null);
+  // const userProfileDetailQuery = useUserProfileDetail(user);
+  //
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     userProfileDetailQuery.refetch();
+  //   }, [userProfileDetailQuery]),
+  // );
+  //
+  // useEffect(() => {
+  //   if (userProfileDetailQuery.data) {
+  //     const profileData = userProfileDetailQuery.data;
+  //     if (profileData.image) {
+  //       let image_url = profileData.image.replace('image/upload/', '');
+  //       setPhoto(image_url);
+  //     }
+  //   }
+  // }, [userProfileDetailQuery.data]);
+
   return (
     <HomeStackNavigator.Navigator>
       <HomeStackNavigator.Screen
@@ -76,11 +99,6 @@ function HomeStack() {
             elevation: 0,
             shadowOpacity: 0,
           },
-          headerLeft: () => (
-            <Pressable onPress={() => navigation.navigate('AccountScreen')}>
-              <ProfileIcon size={100} style={styles.headerLeft} />
-            </Pressable>
-          ),
           headerRight: () => (
             <View style={styles.headerRight}>
               <Pressable onPress={() => navigation.navigate('MessageScreen')}>

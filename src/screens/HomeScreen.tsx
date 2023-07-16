@@ -1,9 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
   FlatList,
+  Image,
   ListRenderItem,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -19,12 +21,17 @@ import {useEvents, useSearchEvents} from '../queries/event';
 import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';
 import {useFocusEffect} from '@react-navigation/native';
+import ProfileIcon from '../components/icons/ProfileIcon';
+import { UserContext } from "../../App";
+import { useUserProfileDetail } from "../queries/userprofile";
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
 const HomeScreen = ({navigation}: Props) => {
+  const {user} = useContext(UserContext);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [photo, setPhoto] = useState<string | null>(null);
   const {data, error, isLoading, isError, fetchNextPage, hasNextPage, refetch} =
     useEvents(page);
   const {
@@ -32,6 +39,53 @@ const HomeScreen = ({navigation}: Props) => {
     isLoading: isLoadingSearch,
     error: errorSearch,
   } = useSearchEvents(search.length > 2 ? search : null);
+
+  const userProfileDetailQuery = useUserProfileDetail(user);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      userProfileDetailQuery.refetch();
+    }, [userProfileDetailQuery]),
+  );
+
+  useEffect(() => {
+    if (userProfileDetailQuery.data) {
+      const profileData = userProfileDetailQuery.data;
+      if (profileData.image) {
+        let image_url = profileData.image.replace('image/upload/', '');
+        setPhoto(image_url);
+      }
+    }
+  }, [userProfileDetailQuery.data]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: '',
+      headerStyle: {
+        backgroundColor: BACKGROUND_MAIN,
+        borderBottomWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+      },
+      headerLeft: () => (
+        <Pressable onPress={() => navigation.navigate('AccountScreen')}>
+          {!photo ? (
+            <ProfileIcon size={100} style={styles.headerLeft} />
+          ) : (
+            <Image
+              source={{uri: photo}}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 125,
+                marginLeft: 8,
+              }}
+            />
+          )}
+        </Pressable>
+      ),
+    });
+  }, [navigation, photo]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -225,6 +279,9 @@ const styles = StyleSheet.create({
     color: BLACK_MAIN,
     fontFamily: Regular,
     alignSelf: 'center',
+  },
+  headerLeft: {
+    marginLeft: 8,
   },
 });
 

@@ -16,6 +16,7 @@ export interface Event {
   price_high: number;
   attendees: Attendee[];
   awaiting_invite: any[];
+  image?: any;
 }
 
 export interface EventArray {

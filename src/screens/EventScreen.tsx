@@ -21,7 +21,6 @@ import {
   BACKGROUND_MAIN,
   BLACK_MAIN,
   BLUE_MAIN,
-  ORANGE_MAIN,
   RED_MAIN,
   WHITE_MAIN,
 } from '../../colors';
@@ -162,12 +161,15 @@ const EventScreen = ({navigation, route}: Props) => {
       }
     }
   };
-
+  console.log(eventData);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
         {eventData && eventData && (
-          <Image source={{uri: null}} style={{width: '100%', height: 200}} />
+          <Image
+            source={{uri: eventData.image.replace('image/upload/', '')}}
+            style={{width: '100%', height: 200, marginBottom: 5}}
+          />
         )}
         <Pressable
           style={[
@@ -211,7 +213,20 @@ const EventScreen = ({navigation, route}: Props) => {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {allAttendees.map((attendee, index) => (
               <View key={index} style={styles.oneAttend}>
-                <ProfileIcon size={140} />
+                {!attendee?.image ? (
+                  <ProfileIcon size={140} />
+                ) : (
+                  <Image
+                    source={{
+                      uri: attendee?.image.replace('image/upload/', ''),
+                    }}
+                    style={{
+                      width: 55,
+                      height: 55,
+                      borderRadius: 125,
+                    }}
+                  />
+                )}
               </View>
             ))}
             <Pressable
