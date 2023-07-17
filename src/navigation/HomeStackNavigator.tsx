@@ -91,26 +91,29 @@ function HomeStack() {
       <HomeStackNavigator.Screen
         name={'HomeScreen'}
         component={HomeScreen}
-        options={({navigation}) => ({
-          headerTitle: '',
-          headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
-          ),
-        })}
+        options={{
+          headerShown: false,
+        }}
+        // options={({navigation}) => ({
+        //   headerTitle: '',
+        //   headerStyle: {
+        //     backgroundColor: BACKGROUND_MAIN,
+        //     borderBottomWidth: 0,
+        //     elevation: 0,
+        //     shadowOpacity: 0,
+        //   },
+        //   headerRight: () => (
+        //     <View style={styles.headerRight}>
+        //       <Pressable onPress={() => navigation.navigate('MessageScreen')}>
+        //         <MessagesIcon size={100} style={styles.headerRightOne} />
+        //       </Pressable>
+        //       <Pressable
+        //         onPress={() => navigation.navigate('FavouritesScreen')}>
+        //         <FavouritesIcon size={100} />
+        //       </Pressable>
+        //     </View>
+        //   ),
+        // })}
       />
       <HomeStackNavigator.Screen
         name={'FavouritesScreen'}

@@ -1,7 +1,7 @@
 /* eslint-disable no-shadow */
 import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-const apiUrl = 'https://30fd-213-7-244-92.ngrok-free.app';
+const apiUrl = 'https://3d3b-46-199-96-253.ngrok-free.app';
 
 export class API {
   private static axios = axios.create({

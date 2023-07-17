@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -11,7 +11,17 @@ import {
   Text,
   TextInput,
 } from 'react-native';
-import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
+import {
+  BACKGROUND_MAIN,
+  BEIGE,
+  BLACK,
+  BLACK_MAIN,
+  BLUE_MAIN,
+  GRAY_1,
+  GRAY_2,
+  WHITE,
+  WHITE_MAIN,
+} from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {Bold, Regular} from '../../fonts';
@@ -22,8 +32,8 @@ import {Event} from '../api/event.api';
 import EventCard from '../components/EventCard';
 import {useFocusEffect} from '@react-navigation/native';
 import ProfileIcon from '../components/icons/ProfileIcon';
-import { UserContext } from "../../App";
-import { useUserProfileDetail } from "../queries/userprofile";
+import {UserContext} from '../../App';
+import {useUserProfileDetail} from '../queries/userprofile';
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
@@ -122,10 +132,11 @@ const HomeScreen = ({navigation}: Props) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.insideBlock}>
         <View style={styles.searchContainer}>
-          <SearchIcon size={100} />
+          <SearchIcon size={100} color={WHITE} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search..."
+            placeholderTextColor={BEIGE}
             onChangeText={text => setSearch(text)}
             value={search}
           />
@@ -150,27 +161,30 @@ const HomeScreen = ({navigation}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   searchContainer: {
     flexDirection: 'row',
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: GRAY_2,
     borderRadius: 15,
     borderWidth: 1,
+    borderColor: GRAY_1,
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginBottom: 5,
+    marginTop: 10,
   },
   insideBlock: {
     marginHorizontal: 8,
   },
   searchInput: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: Regular,
     paddingVertical: 0,
     marginLeft: 4,
     flex: 1,
+    color: BEIGE,
   },
   whiteBlock: {
     borderRadius: 15,
@@ -257,7 +271,6 @@ const styles = StyleSheet.create({
     marginRight: 7,
   },
   find: {
-    backgroundColor: BLUE_MAIN,
     borderRadius: 15,
     paddingHorizontal: 10,
     marginBottom: 4,

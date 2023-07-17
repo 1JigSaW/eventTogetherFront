@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from './constants';
 import {ActivityIndicator} from 'react-native';
 import {UserProfileApi} from './src/api/userprofile';
+import BottomNavigator from "./src/navigation/BottomNavigator";
 
 export const queryClient = new QueryClient();
 
@@ -86,7 +87,7 @@ const App = () => {
           setUserProfile,
         }}>
         <NavigationContainer>
-          <HomeStack />
+          <BottomNavigator />
         </NavigationContainer>
       </UserContext.Provider>
     </QueryClientProvider>

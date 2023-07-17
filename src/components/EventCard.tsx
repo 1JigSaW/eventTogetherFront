@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import {
   BACKGROUND_MAIN,
@@ -138,85 +139,90 @@ const EventCard = ({item, navigation}: any) => {
     <Pressable
       style={styles.whiteBlock}
       onPress={() => navigation.navigate('EventScreen', {event: item.id})}>
-      <View style={styles.topPart}>
-        <View style={styles.leftPart}>
-          {item.image && (
-            <Image
-              style={styles.image}
-              source={{uri: item.image.replace('image/upload/', '')}}
-              resizeMode="contain"
-            />
-          )}
-        </View>
-        <View style={styles.rightPart}>
-          <View style={styles.textRight}>
-            <Text style={styles.textCity}>{item.city}</Text>
+      <ImageBackground source={item.image && item.image.replace('image/upload/', '')}>
+        <View style={styles.topPart}>
+          <View style={styles.leftPart}>
+            {item.image && (
+              <Image
+                style={styles.image}
+                source={{uri: item.image.replace('image/upload/', '')}}
+                resizeMode="contain"
+              />
+            )}
           </View>
-          <View style={styles.textRight}>
-            <Text style={styles.textDate}>
-              {new Date(item.date).toLocaleDateString()}
-            </Text>
-          </View>
-          <Text style={styles.textTitle}>{item.title}</Text>
-          <Text style={styles.textDescription}>
+          <View style={styles.rightPart}>
+            <View style={styles.textRight}>
+              <Text style={styles.textCity}>{item.city}</Text>
+            </View>
+            <View style={styles.textRight}>
+              <Text style={styles.textDate}>
+                {new Date(item.date).toLocaleDateString()}
+              </Text>
+            </View>
+            <Text style={styles.textTitle}>{item.title}</Text>
             <Text style={styles.textDescription}>
-              {`${item.description.substring(0, 100)}...`}
+              <Text style={styles.textDescription}>
+                {`${item.description.substring(0, 100)}...`}
+              </Text>
             </Text>
-          </Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.bottomPart}>
-        <View style={styles.row}>
+        <View style={styles.bottomPart}>
+          <View style={styles.row}>
+            <Pressable
+              style={styles.row}
+              onPress={() =>
+                navigation.navigate('WaitingScreen', {event: item.id})
+              }>
+              <PeopleIcon
+                size={100}
+                color={RED_MAIN}
+                style={{marginLeft: 15, marginBottom: 5.5}}
+              />
+              <Text style={styles.textCountPeople}>{invitesCount}</Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.invitation,
+                awaitingInvite && {backgroundColor: ORANGE_MAIN},
+              ]}
+              onPress={handleAddWait}>
+              {awaitingInvite ? (
+                <>
+                  <Text style={[styles.invitationButton, {marginRight: 5}]}>
+                    You are on the waiting list
+                  </Text>
+                  <CloseIcon size={85} />
+                </>
+              ) : (
+                <>
+                  <AddIcon size={100} />
+                  <Text style={styles.invitationButton}>
+                    Wait for an invitation
+                  </Text>
+                </>
+              )}
+            </Pressable>
+          </View>
           <Pressable
-            style={styles.row}
+            style={styles.find}
             onPress={() =>
-              navigation.navigate('WaitingScreen', {event: item.id})
+              navigation.navigate('FindSwipeScreen', {
+                event: item.id,
+                item: item,
+              })
             }>
-            <PeopleIcon
-              size={100}
-              color={RED_MAIN}
-              style={{marginLeft: 15, marginBottom: 5.5}}
-            />
-            <Text style={styles.textCountPeople}>{invitesCount}</Text>
+            <Text style={styles.findText}>Find someone to go with</Text>
           </Pressable>
-          <Pressable
-            style={[
-              styles.invitation,
-              awaitingInvite && {backgroundColor: ORANGE_MAIN},
-            ]}
-            onPress={handleAddWait}>
-            {awaitingInvite ? (
-              <>
-                <Text style={[styles.invitationButton, {marginRight: 5}]}>
-                  You are on the waiting list
-                </Text>
-                <CloseIcon size={85} />
-              </>
+          <Pressable style={styles.row} onPress={handleAddToFavourite}>
+            {!isFavourite ? (
+              <HeartIcon size={100} color={RED_MAIN} />
             ) : (
-              <>
-                <AddIcon size={100} />
-                <Text style={styles.invitationButton}>
-                  Wait for an invitation
-                </Text>
-              </>
+              <HeartIcon size={100} color={BLUE_MAIN} />
             )}
           </Pressable>
         </View>
-        <Pressable
-          style={styles.find}
-          onPress={() =>
-            navigation.navigate('FindSwipeScreen', {event: item.id, item: item})
-          }>
-          <Text style={styles.findText}>Find someone to go with</Text>
-        </Pressable>
-        <Pressable style={styles.row} onPress={handleAddToFavourite}>
-          {!isFavourite ? (
-            <HeartIcon size={100} color={RED_MAIN} />
-          ) : (
-            <HeartIcon size={100} color={BLUE_MAIN} />
-          )}
-        </Pressable>
-      </View>
+      </ImageBackground>
     </Pressable>
   );
 };
