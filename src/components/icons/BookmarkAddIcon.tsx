@@ -8,17 +8,17 @@ interface Props {
   color?: string;
 }
 
-const ProfileIcon = ({size, style, color = 'black'}: Props) => {
+const BookmarkAddIcon = ({size, style, color = 'black'}: Props) => {
   return (
     <Svg
       width={size}
       height={size}
-      viewBox="0 0 448 512"
+      viewBox="0 0 384 512"
       style={style}
       fill={color}>
-      <Path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/>
+      <Path d="M0 48V487.7C0 501.1 10.9 512 24.3 512c5 0 9.9-1.5 14-4.4L192 400 345.7 507.6c4.1 2.9 9 4.4 14 4.4c13.4 0 24.3-10.9 24.3-24.3V48c0-26.5-21.5-48-48-48H48C21.5 0 0 21.5 0 48z"/>
     </Svg>
   );
 };
 
-export default ProfileIcon;
+export default BookmarkAddIcon;

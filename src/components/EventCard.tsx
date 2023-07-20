@@ -11,25 +11,31 @@ import {
 } from 'react-native';
 import {
   BACKGROUND_MAIN,
+  BLACK,
   BLACK_MAIN,
+  BLUE,
   BLUE_MAIN,
-  ORANGE_MAIN,
-  RED_MAIN,
+  WHITE,
   WHITE_MAIN,
 } from '../../colors';
-import {Bold, Regular} from '../../fonts';
-import PeopleIcon from './icons/PeopleIcon';
-import AddIcon from './icons/AddIcon';
-import HeartIcon from './icons/HeartIcon';
+import {Regular} from '../../fonts';
 import {
   useAddUserFavourite,
   useGetUserFavourites,
   useRemoveUserFavourite,
 } from '../queries/favourite';
 import {UserContext} from '../../App';
-import {useAddUserToEvent, useRemoveUserFromEvent} from '../queries/event';
-import CloseIcon from './icons/CloseIcon';
-import {useFocusEffect} from '@react-navigation/native';
+import {
+  useAddUserToEvent,
+  useEventProfiles,
+  useRemoveUserFromEvent,
+} from '../queries/event';
+import BookmarkIcon from './icons/BookmarkIcon';
+import PeopleOneIcon from './icons/PeopleOneIcon';
+import UserPlusIcon from './icons/UserPlusIcon';
+import FindPeopleIcon from './icons/FindPeopleIcon';
+import BookmarkAddIcon from './icons/BookmarkAddIcon';
+import UserCheckIcon from './icons/UserCheckIcon';
 
 const EventCard = ({item, navigation}: any) => {
   const {user, userProfileExist, userProfile} = useContext(UserContext);
@@ -44,6 +50,10 @@ const EventCard = ({item, navigation}: any) => {
   const [isFavourite, setIsFavourite] = useState(false);
 
   const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
+  const {data: attendees} = useEventProfiles(item.id);
+  const allAttendees = (
+    attendees?.pages.flatMap(page => page.results) || []
+  ).slice(0, 5);
 
   useEffect(() => {
     setAwaitingInvite(
@@ -134,95 +144,109 @@ const EventCard = ({item, navigation}: any) => {
   if (isError) {
     return <Text>Error loading favourites...</Text>;
   }
-  console.log(item.image);
   return (
     <Pressable
       style={styles.whiteBlock}
       onPress={() => navigation.navigate('EventScreen', {event: item.id})}>
-      <ImageBackground source={item.image && item.image.replace('image/upload/', '')}>
-        <View style={styles.topPart}>
-          <View style={styles.leftPart}>
-            {item.image && (
-              <Image
-                style={styles.image}
-                source={{uri: item.image.replace('image/upload/', '')}}
-                resizeMode="contain"
-              />
-            )}
-          </View>
-          <View style={styles.rightPart}>
-            <View style={styles.textRight}>
-              <Text style={styles.textCity}>{item.city}</Text>
-            </View>
-            <View style={styles.textRight}>
-              <Text style={styles.textDate}>
-                {new Date(item.date).toLocaleDateString()}
-              </Text>
-            </View>
-            <Text style={styles.textTitle}>{item.title}</Text>
-            <Text style={styles.textDescription}>
-              <Text style={styles.textDescription}>
-                {`${item.description.substring(0, 100)}...`}
-              </Text>
-            </Text>
-          </View>
-        </View>
-        <View style={styles.bottomPart}>
-          <View style={styles.row}>
-            <Pressable
-              style={styles.row}
-              onPress={() =>
-                navigation.navigate('WaitingScreen', {event: item.id})
-              }>
-              <PeopleIcon
-                size={100}
-                color={RED_MAIN}
-                style={{marginLeft: 15, marginBottom: 5.5}}
-              />
-              <Text style={styles.textCountPeople}>{invitesCount}</Text>
+      {item.image && (
+        <ImageBackground
+          source={{uri: item.image.replace('image/upload/', '')}}
+          style={styles.imageBlock}
+          resizeMode="cover">
+          <View style={styles.overlay} />
+          <View style={styles.bookmarkIconContainer}>
+            <Pressable style={styles.iconBackground} onPress={handleAddWait}>
+              {awaitingInvite ? (
+                <UserPlusIcon size={15} color={BLACK} />
+              ) : (
+                <UserCheckIcon size={15} color={BLACK} />
+              )}
             </Pressable>
             <Pressable
-              style={[
-                styles.invitation,
-                awaitingInvite && {backgroundColor: ORANGE_MAIN},
-              ]}
-              onPress={handleAddWait}>
-              {awaitingInvite ? (
-                <>
-                  <Text style={[styles.invitationButton, {marginRight: 5}]}>
-                    You are on the waiting list
-                  </Text>
-                  <CloseIcon size={85} />
-                </>
+              style={styles.iconBackground}
+              onPress={handleAddToFavourite}>
+              {isFavourite ? (
+                <BookmarkIcon size={15} color={BLACK} />
               ) : (
-                <>
-                  <AddIcon size={100} />
-                  <Text style={styles.invitationButton}>
-                    Wait for an invitation
-                  </Text>
-                </>
+                <BookmarkAddIcon size={15} color={BLACK} />
               )}
             </Pressable>
           </View>
-          <Pressable
-            style={styles.find}
-            onPress={() =>
-              navigation.navigate('FindSwipeScreen', {
-                event: item.id,
-                item: item,
-              })
-            }>
-            <Text style={styles.findText}>Find someone to go with</Text>
-          </Pressable>
-          <Pressable style={styles.row} onPress={handleAddToFavourite}>
-            {!isFavourite ? (
-              <HeartIcon size={100} color={RED_MAIN} />
+          <View style={styles.bottomContainer}>
+            <Text style={styles.textTitle}>{item.title}</Text>
+            <Text style={styles.textTitle}>
+              {new Date(item.date).toLocaleDateString()}
+            </Text>
+            <Text style={styles.textTitle}>{item.city}</Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 10,
+              marginRight: 10,
+            }}>
+            {invitesCount > 0 ? (
+              <Pressable
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 16,
+                }}
+                onPress={() =>
+                  navigation.navigate('WaitingScreen', {event: item.id})
+                }>
+                {allAttendees.map((attendee, index) => (
+                  <View key={index}>
+                    {!attendee?.image ? (
+                      <View style={[styles.iconBackground, {marginLeft: -10}]}>
+                        <PeopleOneIcon size={15} />
+                      </View>
+                    ) : (
+                      <Image
+                        source={{
+                          uri: attendee?.image.replace('image/upload/', ''),
+                        }}
+                        style={{
+                          width: 25,
+                          height: 25,
+                          borderRadius: 125,
+                          marginLeft: -10,
+                        }}
+                      />
+                    )}
+                  </View>
+                ))}
+
+                <View>
+                  <Text style={styles.textCountPeople}>
+                    + {invitesCount - 5}
+                  </Text>
+                  <Text style={styles.textCountPeople}>members</Text>
+                </View>
+              </Pressable>
             ) : (
-              <HeartIcon size={100} color={BLUE_MAIN} />
+              <View />
             )}
-          </Pressable>
-        </View>
-      </ImageBackground>
+            <Pressable
+              style={styles.find}
+              onPress={() =>
+                navigation.navigate('FindSwipeScreen', {
+                  event: item.id,
+                  item: item,
+                })
+              }>
+              <FindPeopleIcon
+                size={15}
+                color={BLACK}
+                style={{marginRight: 5}}
+              />
+              <Text style={styles.findText}>Find someone to go with</Text>
+            </Pressable>
+          </View>
+        </ImageBackground>
+      )}
     </Pressable>
   );
 };
@@ -236,7 +260,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: WHITE_MAIN,
     borderRadius: 15,
-    borderWidth: 1,
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -255,7 +278,6 @@ const styles = StyleSheet.create({
   whiteBlock: {
     borderRadius: 15,
     backgroundColor: WHITE_MAIN,
-    borderWidth: 1,
     marginTop: 8,
   },
   topPart: {
@@ -293,10 +315,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   textTitle: {
-    color: BLACK_MAIN,
-    fontSize: 18,
-    fontFamily: Bold,
-    lineHeight: 22,
+    color: WHITE,
+    fontSize: 12,
+    fontFamily: Regular,
+    lineHeight: 12,
+    marginTop: 5,
   },
   textDescription: {
     color: BLACK_MAIN,
@@ -310,10 +333,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textCountPeople: {
-    marginLeft: 2.5,
-    fontSize: 16,
-    color: BLACK_MAIN,
-    marginBottom: 5,
+    marginLeft: 6,
+    fontSize: 12,
+    color: WHITE,
+    lineHeight: 12,
   },
   invitation: {
     flexDirection: 'row',
@@ -337,21 +360,50 @@ const styles = StyleSheet.create({
     marginRight: 7,
   },
   find: {
-    backgroundColor: BLUE_MAIN,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: BLUE,
     borderRadius: 15,
     paddingHorizontal: 10,
-    marginBottom: 4,
   },
   findText: {
-    fontSize: 10,
+    fontSize: 14,
     alignItems: 'center',
     lineHeight: 20,
-    color: BLACK_MAIN,
+    color: BLACK,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  imageBlock: {
+    borderRadius: 13,
+    overflow: 'hidden',
+    height: 150,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // Это сделает слой абсолютным и он займет всю область родителя
+    backgroundColor: BLACK,
+    opacity: 0.95,
+  },
+  iconBackground: {
+    backgroundColor: BLUE,
+    borderRadius: 30,
+    padding: 5,
+    marginLeft: 7,
+  },
+  bookmarkIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    margin: 5,
+  },
+  bottomContainer: {
+    margin: 6,
+    width: '70%',
   },
 });
 

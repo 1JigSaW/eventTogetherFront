@@ -74,20 +74,20 @@ function HomeStack() {
 
   return (
     <HomeStackNavigator.Navigator>
-      <HomeStackNavigator.Screen
-        name={'SignUpScreen'}
-        component={SignUpScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <HomeStackNavigator.Screen
-        name={'SignInScreen'}
-        component={SignInScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
+      {/*<HomeStackNavigator.Screen*/}
+      {/*  name={'SignUpScreen'}*/}
+      {/*  component={SignUpScreen}*/}
+      {/*  options={{*/}
+      {/*    headerShown: false,*/}
+      {/*  }}*/}
+      {/*/>*/}
+      {/*<HomeStackNavigator.Screen*/}
+      {/*  name={'SignInScreen'}*/}
+      {/*  component={SignInScreen}*/}
+      {/*  options={{*/}
+      {/*    headerShown: false,*/}
+      {/*  }}*/}
+      {/*/>*/}
       <HomeStackNavigator.Screen
         name={'HomeScreen'}
         component={HomeScreen}
@@ -143,87 +143,10 @@ function HomeStack() {
         })}
       />
       <HomeStackNavigator.Screen
-        name={'AccountScreen'}
-        component={AccountScreen}
-        options={({navigation}) => ({
-          headerTitle: 'Account',
-          headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          headerTitleStyle: {
-            textAlign: 'center',
-          },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
-          ),
-        })}
-      />
-      <HomeStackNavigator.Screen
         name={'WaitingScreen'}
         component={WaitingScreen}
         options={({navigation}) => ({
           headerTitle: 'Waiting list',
-          headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          headerTitleStyle: {
-            textAlign: 'center',
-          },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
-          ),
-        })}
-      />
-      <HomeStackNavigator.Screen
-        name={'MessageScreen'}
-        component={MessageScreen}
-        options={({navigation}) => ({
-          headerTitle: 'Messages',
-          headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
-            borderBottomWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-          },
-          headerTitleStyle: {
-            textAlign: 'center',
-          },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
-          ),
-        })}
-      />
-      <HomeStackNavigator.Screen
-        name={'ChatScreen'}
-        component={ChatScreen}
-        options={({navigation}) => ({
           headerStyle: {
             backgroundColor: BACKGROUND_MAIN,
             borderBottomWidth: 0,
