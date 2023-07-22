@@ -8,7 +8,7 @@ import View = Animated.View;
 import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
-import {BACKGROUND_MAIN} from '../../colors';
+import { BACKGROUND_MAIN, BLACK, BLUE } from "../../colors";
 import FavouritesScreen from '../screens/FavouritesScreen';
 import AccountScreen from '../screens/AccountScreen';
 import WaitingScreen from '../screens/WaitingScreen';
@@ -19,6 +19,7 @@ import FindSwipeScreen from '../screens/FindSwipeScreen';
 import {useUserProfileDetail} from '../queries/userprofile';
 import {UserContext} from '../../App';
 import {useFocusEffect} from '@react-navigation/native';
+import LeftIcon from "../components/icons/LeftIcon";
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -173,8 +174,10 @@ function HomeStack() {
         name={'EventScreen'}
         component={EventScreen}
         options={({navigation}) => ({
+          headerTransparent: true,
+          headerTitle: '',
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: 'transparent',
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
@@ -182,15 +185,21 @@ function HomeStack() {
           headerTitleStyle: {
             textAlign: 'center',
           },
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 15,
+                marginTop: 5,
+                borderRadius: 35,
+                padding: 5,
+                backgroundColor: BLUE,
+              }}>
+              <LeftIcon size={15} color={BLACK} />
+            </Pressable>
+          ),
           headerRight: () => (
             <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
             </View>
           ),
         })}

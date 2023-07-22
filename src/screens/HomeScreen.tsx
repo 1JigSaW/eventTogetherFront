@@ -34,6 +34,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import {UserContext} from '../../App';
 import {useUserProfileDetail} from '../queries/userprofile';
+import {useGetEvents, useGetUserFavourites} from '../queries/favourite';
 
 type Props = StackScreenProps<HomeStackParamList, 'HomeScreen'>;
 
@@ -51,6 +52,22 @@ const HomeScreen = ({navigation}: Props) => {
   } = useSearchEvents(search.length > 2 ? search : null);
 
   const userProfileDetailQuery = useUserProfileDetail(user);
+
+  const {
+    data: userFavourites,
+    isLoading: isLoadingFavourites,
+    isError: isErrorFavourites,
+  } = useGetUserFavourites(user);
+
+  const eventIds = (
+    userFavourites?.map(favourite => favourite.favourite_event) || []
+  ).slice(0, 4);
+
+  const {
+    data: events,
+    isLoading: isLoadingEvents,
+    isError: isErrorEvents,
+  } = useGetEvents(eventIds);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -141,7 +158,44 @@ const HomeScreen = ({navigation}: Props) => {
             value={search}
           />
         </View>
-        {searchResults?.length === undefined && search.length > 2 ? (
+        <View style={{marginTop: 3}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={styles.titleFavourites}>My favourites</Text>
+            {userFavourites && userFavourites.length > 5 && (
+              <Text style={styles.titleFavourites}>See all</Text>
+            )}
+          </View>
+          <View style={styles.row2}>
+            {events &&
+              events.map((event: any, index: number) => (
+                <View key={index} style={styles.eventContainer}>
+                  {event.image ? (
+                    <Image
+                      source={{
+                        uri: event.image
+                          ? event.image.replace('image/upload/', '')
+                          : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
+                      }}
+                      resizeMode="contain"
+                      style={styles.eventImage}
+                    />
+                  ) : (
+                    <View style={styles.placeholderImage} />
+                  )}
+                  <Text style={styles.eventTitle}>
+                    {new Date(event.date).toLocaleDateString()}
+                  </Text>
+                </View>
+              ))}
+          </View>
+        </View>
+
+        {!searchResults?.length && search.length > 2 ? (
           <Text style={styles.notFoundText}>{noResultsMessage}</Text>
         ) : (
           <FlatList
@@ -270,6 +324,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 7,
   },
+  row2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   find: {
     borderRadius: 15,
     paddingHorizontal: 10,
@@ -289,13 +348,40 @@ const styles = StyleSheet.create({
   },
   notFoundText: {
     fontSize: 16,
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: Regular,
     alignSelf: 'center',
   },
   headerLeft: {
     marginLeft: 8,
   },
+  titleFavourites: {
+    color: WHITE,
+    fontFamily: Regular,
+    fontSize: 16,
+    marginBottom: 3,
+  },
+  eventContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5,
+  },
+  eventImage: {
+    width: 80, // Установите ширину для изображения
+    height: 40, // Установите высоту для изображения
+  },
+  eventTitle: {
+    marginTop: 5, // Отступ для текста от изображения
+    textAlign: 'center', // Центрируем текст
+    fontSize: 12,
+    color: WHITE,
+  },
+  placeholderImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#cccccc', // Цвет для плейсхолдера изображения
+  }
 });
 
 export default HomeScreen;

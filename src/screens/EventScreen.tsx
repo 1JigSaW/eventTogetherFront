@@ -9,16 +9,17 @@ import {
 import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
 import {
   Alert,
-  Image,
+  Image, ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-} from 'react-native';
+  View
+} from "react-native";
 import {Event} from '../api/event.api';
 import {
   BACKGROUND_MAIN,
+  BLACK,
   BLACK_MAIN,
   BLUE_MAIN,
   RED_MAIN,
@@ -36,6 +37,7 @@ import HeartIcon from '../components/icons/HeartIcon';
 import {queryClient, UserContext} from '../../App';
 import {useFocusEffect} from '@react-navigation/native';
 import RemoveIcon from '../components/icons/RemoveIcon';
+import {LinearGradient} from 'react-native-svg';
 
 type Props = StackScreenProps<HomeStackParamList, 'EventScreen'>;
 
@@ -166,10 +168,29 @@ const EventScreen = ({navigation, route}: Props) => {
     <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
         {eventData && eventData && (
-          <Image
-            source={{uri: eventData.image.replace('image/upload/', '')}}
-            style={{width: '100%', height: 200, marginBottom: 5}}
-          />
+          <>
+            <ImageBackground
+              source={{uri: eventData.image.replace('image/upload/', '')}}
+              style={{height: 200, marginBottom: 5, marginTop: 10}}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'flex-end',
+                  padding: 10,
+                  backgroundColor: 'rgba(0,0,0,0.7)',
+                }}>
+                <Text style={{color: 'white', fontSize: 16}}>
+                  {eventData.title}
+                </Text>
+                <Text style={{color: 'white', fontSize: 16}}>
+                  {new Date(eventData.date).toLocaleDateString()}
+                </Text>
+                <Text style={{color: 'white', fontSize: 16}}>
+                  {eventData.city}
+                </Text>
+              </View>
+            </ImageBackground>
+          </>
         )}
         <Pressable
           style={[
@@ -261,7 +282,7 @@ const EventScreen = ({navigation, route}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   insideBlock: {
     marginHorizontal: 8,

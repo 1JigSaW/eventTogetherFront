@@ -15,13 +15,13 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {
-  BACKGROUND_MAIN,
+  BACKGROUND_MAIN, BLACK,
   BLACK_MAIN,
   BLUE_MAIN,
   GREEN_MAIN,
   RED_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+  WHITE_MAIN
+} from "../../colors";
 import ProfileIcon from '../components/icons/ProfileIcon';
 import {Bold, Regular} from '../../fonts';
 import {useSearchInterests} from '../queries/interest';
@@ -283,12 +283,12 @@ const AccountScreen = ({navigation}: Props) => {
                 {pickedImage ? (
                   <Image
                     source={{uri: pickedImage}}
-                    style={{width: 250, height: 250, borderRadius: 125}}
+                    style={{width: 100, height: 100, borderRadius: 125}}
                   />
                 ) : photo ? (
                   <Image
                     source={{uri: photo}}
-                    style={{width: 250, height: 250, borderRadius: 125}}
+                    style={{width: 100, height: 100, borderRadius: 125}}
                   />
                 ) : (
                   <ProfileIcon size={250} />
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   profileBlock: {
     flexDirection: 'row',
