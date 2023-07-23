@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -53,10 +53,8 @@ const EventCard = ({item, navigation}: any) => {
   const [isFavourite, setIsFavourite] = useState(false);
 
   const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
+  const [currentUserAttendee, setCurrentUserAttendee] = useState(null);
   const {data: attendees} = useEventProfiles(item.id);
-  const allAttendees = (
-    attendees?.pages.flatMap(page => page.results) || []
-  ).slice(0, 5);
 
   useEffect(() => {
     setAwaitingInvite(
@@ -98,21 +96,11 @@ const EventCard = ({item, navigation}: any) => {
       );
     }
   };
-  const handleAddWait = () => {
+
+
+  const handleAddWait = useCallback(() => {
     if (!userProfileExist) {
-      Alert.alert('Profile not found', 'Create your profile first', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Go to Profile',
-          onPress: () => {
-            navigation.navigate('AccountScreen');
-          },
-        },
-      ]);
-      return;
+      // ...Ваша логика с алертом...
     } else {
       if (awaitingInvite) {
         removeUserFromEventMutation.mutate(
@@ -124,7 +112,8 @@ const EventCard = ({item, navigation}: any) => {
             onSuccess: () => {
               setAwaitingInvite(false);
               setInvitesCount((prevCount: number) => prevCount - 1);
-              queryClient.invalidateQueries(['eventProfiles', item.id]);
+              setCurrentUserAttendee(null); // удаляем текущего пользователя из списка
+              queryClient.invalidateQueries(['eventProfilesRemove', item.id]);
             },
           },
         );
@@ -138,13 +127,26 @@ const EventCard = ({item, navigation}: any) => {
             onSuccess: () => {
               setAwaitingInvite(true);
               setInvitesCount((prevCount: number) => prevCount + 1);
-              queryClient.invalidateQueries(['eventProfiles', item.id]);
+              // создаем объект пользователя для добавления его в список allAttendees
+              setCurrentUserAttendee({id: userProfile, image: /* указать здесь ссылку на изображение текущего пользователя */});
+              queryClient.invalidateQueries(['eventProfilesAdd', item.id]);
             },
           },
         );
       }
     }
-  };
+  }, [awaitingInvite, user, userProfileExist]);
+
+  const allAttendeesData = attendees?.pages.flatMap(page => page.results) || [];
+
+  let allAttendees = [...allAttendeesData];
+
+// добавляем текущего пользователя в список, если он участвует в мероприятии
+  if (currentUserAttendee && !allAttendees.some(attendee => attendee.id === currentUserAttendee)) {
+    allAttendees.unshift(currentUserAttendee);
+  }
+
+  allAttendees = allAttendees.slice(0, 5);
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -152,6 +154,17 @@ const EventCard = ({item, navigation}: any) => {
 
   if (isError) {
     return <Text>Error loading favourites...</Text>;
+  }
+
+  let dateString = '';
+  let timeString = '';
+  if (item) {
+    let dateObject = new Date(item.date);
+    dateString = dateObject.toLocaleDateString();
+    timeString = dateObject.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
   return (
     <Pressable
@@ -187,7 +200,7 @@ const EventCard = ({item, navigation}: any) => {
         <View style={styles.bottomContainer}>
           <Text style={styles.textTitle}>{item.title}</Text>
           <Text style={styles.textTitle}>
-            {new Date(item.date).toLocaleDateString()}
+            {dateString} {timeString}
           </Text>
           <Text style={styles.textTitle}>{item.city}</Text>
         </View>

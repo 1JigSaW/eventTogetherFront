@@ -8,7 +8,7 @@ import View = Animated.View;
 import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
-import { BACKGROUND_MAIN, BLACK, BLUE } from "../../colors";
+import {BACKGROUND_MAIN, BLACK, BLUE} from '../../colors';
 import FavouritesScreen from '../screens/FavouritesScreen';
 import AccountScreen from '../screens/AccountScreen';
 import WaitingScreen from '../screens/WaitingScreen';
@@ -19,7 +19,11 @@ import FindSwipeScreen from '../screens/FindSwipeScreen';
 import {useUserProfileDetail} from '../queries/userprofile';
 import {UserContext} from '../../App';
 import {useFocusEffect} from '@react-navigation/native';
-import LeftIcon from "../components/icons/LeftIcon";
+import LeftIcon from '../components/icons/LeftIcon';
+import BookmarkAddIcon from '../components/icons/BookmarkAddIcon';
+import BookmarkIcon from '../components/icons/BookmarkIcon';
+import UserCheckIcon from '../components/icons/UserCheckIcon';
+import UserPlusIcon from '../components/icons/UserPlusIcon';
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -53,25 +57,8 @@ export type HomeStackParamList = {
 };
 
 function HomeStack() {
-  // const {user} = useContext(UserContext);
-  // const [photo, setPhoto] = useState<string | null>(null);
-  // const userProfileDetailQuery = useUserProfileDetail(user);
-  //
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     userProfileDetailQuery.refetch();
-  //   }, [userProfileDetailQuery]),
-  // );
-  //
-  // useEffect(() => {
-  //   if (userProfileDetailQuery.data) {
-  //     const profileData = userProfileDetailQuery.data;
-  //     if (profileData.image) {
-  //       let image_url = profileData.image.replace('image/upload/', '');
-  //       setPhoto(image_url);
-  //     }
-  //   }
-  // }, [userProfileDetailQuery.data]);
+  const [isFavourite, setIsFavourite] = useState(false);
+  const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
 
   return (
     <HomeStackNavigator.Navigator>
@@ -185,23 +172,6 @@ function HomeStack() {
           headerTitleStyle: {
             textAlign: 'center',
           },
-          headerLeft: () => (
-            <Pressable
-              onPress={() => navigation.goBack()}
-              style={{
-                marginLeft: 15,
-                marginTop: 5,
-                borderRadius: 35,
-                padding: 5,
-                backgroundColor: BLUE,
-              }}>
-              <LeftIcon size={15} color={BLACK} />
-            </Pressable>
-          ),
-          headerRight: () => (
-            <View style={styles.headerRight}>
-            </View>
-          ),
         })}
       />
       <HomeStackNavigator.Screen
@@ -230,10 +200,28 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     flexDirection: 'row',
-    marginRight: 8,
+    marginRight: 15,
+    marginTop: 5,
+    borderRadius: 35,
+    padding: 5,
+    backgroundColor: BLUE,
   },
   headerRightOne: {
     marginRight: 12,
+  },
+  iconBackground: {
+    backgroundColor: BLUE,
+    borderRadius: 15,
+    padding: 5,
+    marginLeft: 7,
+    marginTop: 5,
+    marginRight: 6,
+  },
+  bookmarkIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    margin: 5,
   },
 });
 

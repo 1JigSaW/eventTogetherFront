@@ -53,7 +53,7 @@ export function useAddUserToEvent() {
       EventApi.addUserToEvent(payload.eventId, payload.userId),
     {
       onSuccess: (data, variables) => {
-        queryClient.invalidateQueries(['eventProfiles', variables.eventId]);
+        queryClient.invalidateQueries(['eventProfilesAdd', variables.eventId]);
       },
     },
   );
@@ -66,7 +66,10 @@ export function useRemoveUserFromEvent() {
       EventApi.removeUserFromEvent(payload.eventId, payload.userId),
     {
       onSuccess: (data, variables) => {
-        queryClient.invalidateQueries(['eventProfiles', variables.eventId]);
+        queryClient.invalidateQueries([
+          'eventProfilesRemove',
+          variables.eventId,
+        ]);
       },
     },
   );

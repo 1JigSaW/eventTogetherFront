@@ -6,23 +6,25 @@ import {
   useGetUserFavourites,
   useRemoveUserFavourite,
 } from '../queries/favourite';
-import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
   Alert,
-  Image, ImageBackground,
+  Image,
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  View
-} from "react-native";
+  View,
+} from 'react-native';
 import {Event} from '../api/event.api';
 import {
-  BACKGROUND_MAIN,
   BLACK,
   BLACK_MAIN,
+  BLUE,
   BLUE_MAIN,
   RED_MAIN,
+  WHITE,
   WHITE_MAIN,
 } from '../../colors';
 import {Bold, Regular, SemiBold} from '../../fonts';
@@ -31,13 +33,14 @@ import {
   useEventProfiles,
   useRemoveUserFromEvent,
 } from '../queries/event';
-import ProfileIcon from '../components/icons/ProfileIcon';
-import AddIcon from '../components/icons/AddIcon';
-import HeartIcon from '../components/icons/HeartIcon';
 import {queryClient, UserContext} from '../../App';
 import {useFocusEffect} from '@react-navigation/native';
-import RemoveIcon from '../components/icons/RemoveIcon';
-import {LinearGradient} from 'react-native-svg';
+import PeopleOneIcon from '../components/icons/PeopleOneIcon';
+import LeftIcon from '../components/icons/LeftIcon';
+import UserCheckIcon from '../components/icons/UserCheckIcon';
+import UserPlusIcon from '../components/icons/UserPlusIcon';
+import BookmarkAddIcon from '../components/icons/BookmarkAddIcon';
+import BookmarkIcon from '../components/icons/BookmarkIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'EventScreen'>;
 
@@ -58,6 +61,8 @@ const EventScreen = ({navigation, route}: Props) => {
   const removeUserFromEventMutation = useRemoveUserFromEvent();
 
   const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
+
+  const [invitesCount, setInvitesCount] = useState(0);
 
   const allAttendees = (
     attendees?.pages.flatMap(page => page.results) || []
@@ -94,7 +99,7 @@ const EventScreen = ({navigation, route}: Props) => {
     }, [eventId, userFavourites]),
   );
 
-  const handleAddToFavourite = () => {
+  const handleAddToFavourite = useCallback(() => {
     if (isFavourite) {
       removeUserFavourite.mutate(
         {user: user, favourite_event: eventId},
@@ -116,9 +121,15 @@ const EventScreen = ({navigation, route}: Props) => {
         },
       );
     }
-  };
+  }, [addUserFavourite, eventId, isFavourite, removeUserFavourite, user]);
 
-  const handleAddWait = () => {
+  useEffect(() => {
+    if (eventData && eventData.awaiting_invite) {
+      setInvitesCount(eventData.awaiting_invite.length);
+    }
+  }, [eventData]);
+
+  const handleAddWait = useCallback(() => {
     if (!userProfileExist) {
       Alert.alert('Profile not found', 'Create your profile first', [
         {
@@ -143,7 +154,8 @@ const EventScreen = ({navigation, route}: Props) => {
           {
             onSuccess: () => {
               setAwaitingInvite(false);
-              queryClient.invalidateQueries(['useEventProfilesQueryKey']);
+              setInvitesCount((prevCount: number) => prevCount - 1);
+              queryClient.invalidateQueries(['eventProfilesRemove', eventId]);
             },
           },
         );
@@ -156,14 +168,78 @@ const EventScreen = ({navigation, route}: Props) => {
           {
             onSuccess: () => {
               setAwaitingInvite(true);
-              queryClient.invalidateQueries(['useEventProfilesQueryKey']);
+              setInvitesCount((prevCount: number) => prevCount + 1);
+              queryClient.invalidateQueries(['eventProfilesAdd', eventId]);
             },
           },
         );
       }
     }
-  };
-  console.log(eventData);
+  }, [
+    awaitingInvite,
+    userProfileExist,
+    navigation,
+    removeUserFromEventMutation,
+    addUserToEventMutation,
+    eventId,
+    user,
+  ]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={{
+            marginLeft: 15,
+            marginTop: 5,
+            borderRadius: 35,
+            padding: 5,
+            backgroundColor: BLUE,
+          }}>
+          <LeftIcon size={15} color={BLACK} />
+        </Pressable>
+      ),
+      headerRight: () => (
+        <View style={styles.bookmarkIconContainer}>
+          <Pressable style={styles.iconBackground} onPress={handleAddWait}>
+            {awaitingInvite ? (
+              <UserCheckIcon size={15} color={BLACK} />
+            ) : (
+              <UserPlusIcon size={15} color={BLACK} />
+            )}
+          </Pressable>
+          <Pressable onPress={handleAddToFavourite} style={styles.headerRight}>
+            {isFavourite ? (
+              <BookmarkAddIcon size={15} color={BLACK} />
+            ) : (
+              <BookmarkIcon size={15} color={BLACK} />
+            )}
+          </Pressable>
+        </View>
+      ),
+    });
+  }, [
+    awaitingInvite,
+    handleAddToFavourite,
+    handleAddWait,
+    isFavourite,
+    navigation,
+  ]);
+
+  console.log(awaitingInvite);
+
+  let dateString = '';
+  let timeString = '';
+  if (eventData) {
+    let dateObject = new Date(eventData.date);
+    dateString = dateObject.toLocaleDateString();
+    timeString = dateObject.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
@@ -183,7 +259,7 @@ const EventScreen = ({navigation, route}: Props) => {
                   {eventData.title}
                 </Text>
                 <Text style={{color: 'white', fontSize: 16}}>
-                  {new Date(eventData.date).toLocaleDateString()}
+                  {dateString} {timeString}
                 </Text>
                 <Text style={{color: 'white', fontSize: 16}}>
                   {eventData.city}
@@ -192,50 +268,32 @@ const EventScreen = ({navigation, route}: Props) => {
             </ImageBackground>
           </>
         )}
-        <Pressable
-          style={[
-            styles.favourites,
-            isFavourite && {backgroundColor: RED_MAIN},
-          ]}
-          onPress={handleAddToFavourite}>
-          {!isFavourite ? (
+        <View style={styles.additionalBlock}>
+          {eventData && eventData.description && (
             <>
-              <HeartIcon size={100} color={RED_MAIN} style={{marginTop: 8}} />
-              <Text style={styles.textFavourites}>Add to favourites</Text>
-            </>
-          ) : (
-            <>
-              <HeartIcon size={100} color={BLUE_MAIN} style={{marginTop: 8}} />
-              <Text style={[styles.textFavourites, {color: BLUE_MAIN}]}>
-                Remove from favourites
+              <Text style={styles.textDescriptionTitle}>Description:</Text>
+              <Text style={styles.textDescription}>
+                {eventData.description}
               </Text>
             </>
           )}
-        </Pressable>
-        <Pressable style={styles.findBlock}>
-          <Text style={styles.textFind}>Find to go with</Text>
-        </Pressable>
-        {/*{eventData && eventData.title && <Text>{eventData.title}</Text>}*/}
-        <View style={{alignItems: 'flex-end'}}>
-          {eventData && eventData.date && (
-            <Text style={styles.textDate}>
-              {new Date(eventData.date).toLocaleDateString()}
-            </Text>
-          )}
-          {eventData && eventData.city && (
-            <Text style={styles.textCity}>{eventData.city}</Text>
-          )}
-        </View>
-        {eventData && eventData.description && (
-          <Text style={styles.textDescription}>{eventData.description}</Text>
-        )}
-        <Text style={styles.title1}>Attendees:</Text>
-        <View style={styles.attendeesBlock}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Text style={styles.titleAttendees}>Attendees:</Text>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('WaitingScreen', {event: eventId})
+            }
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 8,
+              marginLeft: 30,
+            }}>
             {allAttendees.map((attendee, index) => (
               <View key={index} style={styles.oneAttend}>
                 {!attendee?.image ? (
-                  <ProfileIcon size={140} />
+                  <View style={[styles.iconBackgroundBig, {marginLeft: -30}]}>
+                    <PeopleOneIcon size={40} />
+                  </View>
                 ) : (
                   <Image
                     source={{
@@ -245,35 +303,48 @@ const EventScreen = ({navigation, route}: Props) => {
                       width: 55,
                       height: 55,
                       borderRadius: 125,
+                      marginLeft: -30,
                     }}
                   />
                 )}
               </View>
             ))}
-            <Pressable
-              style={{alignItems: 'center', marginLeft: 4}}
-              onPress={handleAddWait}>
-              {!awaitingInvite ? (
-                <AddIcon size={300} color={BLACK_MAIN} />
-              ) : (
-                <RemoveIcon size={300} color={BLACK_MAIN} />
+            <View>
+              {invitesCount > 5 && (
+                <>
+                  <Text style={styles.textCountPeople}>
+                    + {invitesCount - 5}
+                  </Text>
+                  <Text style={styles.textCountPeople}>members</Text>
+                </>
               )}
-            </Pressable>
-          </View>
-          <Pressable
-            onPress={() =>
-              navigation.navigate('WaitingScreen', {event: eventId})
-            }
-            style={{
-              width: '95%',
-              alignItems: 'center',
-              marginTop: 6,
-              borderWidth: 1,
-              borderRadius: 15,
-            }}>
-            <Text style={styles.allUsers}>See all</Text>
+            </View>
+            {/*<Pressable*/}
+            {/*  style={{alignItems: 'center', marginLeft: 4}}*/}
+            {/*  onPress={handleAddWait}>*/}
+            {/*  {!awaitingInvite ? (*/}
+            {/*    <AddIcon size={300} color={BLACK_MAIN} />*/}
+            {/*  ) : (*/}
+            {/*    <RemoveIcon size={300} color={BLACK_MAIN} />*/}
+            {/*  )}*/}
+            {/*</Pressable>*/}
           </Pressable>
         </View>
+        {/*<View style={styles.attendeesBlock}>*/}
+        {/*  <Pressable*/}
+        {/*    onPress={() =>*/}
+        {/*      navigation.navigate('WaitingScreen', {event: eventId})*/}
+        {/*    }*/}
+        {/*    style={{*/}
+        {/*      width: '95%',*/}
+        {/*      alignItems: 'center',*/}
+        {/*      marginTop: 6,*/}
+        {/*      borderWidth: 1,*/}
+        {/*      borderRadius: 15,*/}
+        {/*    }}>*/}
+        {/*    <Text style={styles.allUsers}>See all</Text>*/}
+        {/*  </Pressable>*/}
+        {/*</View>*/}
       </View>
     </ScrollView>
   );
@@ -299,8 +370,14 @@ const styles = StyleSheet.create({
   },
   textDescription: {
     fontFamily: Regular,
+    fontSize: 14,
+    color: WHITE,
+    marginTop: 4,
+  },
+  textDescriptionTitle: {
+    fontFamily: Bold,
     fontSize: 16,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   attendeesBlock: {
     marginTop: 4,
@@ -309,11 +386,11 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 15,
   },
-  title1: {
-    marginTop: 8,
+  titleAttendees: {
     fontFamily: Bold,
-    fontSize: 20,
-    color: BLACK_MAIN,
+    fontSize: 16,
+    color: WHITE,
+    marginTop: 4,
   },
   oneAttend: {
     marginRight: 6,
@@ -360,6 +437,44 @@ const styles = StyleSheet.create({
     color: BLACK_MAIN,
     fontSize: 16,
     fontFamily: Regular,
+  },
+  additionalBlock: {
+    marginTop: 4,
+    marginHorizontal: 8,
+    marginBottom: 8,
+  },
+  iconBackground: {
+    backgroundColor: BLUE,
+    borderRadius: 15,
+    padding: 5,
+    marginLeft: 7,
+    marginTop: 5,
+    marginRight: 6,
+  },
+  textCountPeople: {
+    marginLeft: 6,
+    fontSize: 12,
+    color: WHITE,
+    lineHeight: 12,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    marginRight: 15,
+    marginTop: 5,
+    borderRadius: 35,
+    padding: 5,
+    backgroundColor: BLUE,
+  },
+  bookmarkIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    margin: 5,
+  },
+  iconBackgroundBig: {
+    backgroundColor: BLUE,
+    borderRadius: 100,
+    padding: 10,
   },
 });
 
