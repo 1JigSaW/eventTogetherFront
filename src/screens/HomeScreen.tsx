@@ -166,14 +166,24 @@ const HomeScreen = ({navigation}: Props) => {
               alignItems: 'center',
             }}>
             <Text style={styles.titleFavourites}>My favourites</Text>
-            {userFavourites && userFavourites.length > 5 && (
-              <Text style={styles.titleFavourites}>See all</Text>
+            {userFavourites && userFavourites.length > 4 && (
+              <Pressable
+                onPress={() => navigation.navigate('FavouritesScreen')}>
+                <Text style={styles.titleFavourites}>See all</Text>
+              </Pressable>
             )}
           </View>
-          <View style={styles.row2}>
-            {events &&
-              events.map((event: any, index: number) => (
-                <View key={index} style={styles.eventContainer}>
+          <View style={[styles.row2, {minHeight: 90}]}>
+            {isLoadingEvents ? (
+              <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+              events?.map((event: any, index: number) => (
+                <Pressable
+                  key={index}
+                  style={styles.eventContainer}
+                  onPress={() =>
+                    navigation.navigate('EventScreen', {event: event.id})
+                  }>
                   {event.image ? (
                     <Image
                       source={{
@@ -190,9 +200,11 @@ const HomeScreen = ({navigation}: Props) => {
                   <Text style={styles.eventTitle}>
                     {new Date(event.date).toLocaleDateString()}
                   </Text>
-                </View>
-              ))}
+                </Pressable>
+              ))
+            )}
           </View>
+
         </View>
 
         {!searchResults?.length && search.length > 2 ? (
@@ -231,6 +243,7 @@ const styles = StyleSheet.create({
   },
   insideBlock: {
     marginHorizontal: 8,
+    flex: 1,
   },
   searchInput: {
     fontSize: 14,
@@ -381,7 +394,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     backgroundColor: '#cccccc', // Цвет для плейсхолдера изображения
-  }
+  },
 });
 
 export default HomeScreen;

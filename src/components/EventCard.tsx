@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
-  Alert,
   ImageBackground,
 } from 'react-native';
 import {
@@ -20,7 +19,7 @@ import {
 } from '../../colors';
 import {Regular} from '../../fonts';
 import {
-  ADD_USER_FAVOURITE_QUERY_KEY,
+  ADD_USER_FAVOURITE_QUERY_KEY, GET_USER_FAVOURITES_QUERY_KEY,
   REMOVE_USER_FAVOURITE_QUERY_KEY,
   useAddUserFavourite,
   useGetUserFavourites,
@@ -28,7 +27,6 @@ import {
 } from '../queries/favourite';
 import {queryClient, UserContext} from '../../App';
 import {
-  EVENT_QUERY_KEY,
   useAddUserToEvent,
   useEventProfiles,
   useRemoveUserFromEvent,
@@ -53,7 +51,6 @@ const EventCard = ({item, navigation}: any) => {
   const [isFavourite, setIsFavourite] = useState(false);
 
   const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
-  const [currentUserAttendee, setCurrentUserAttendee] = useState(null);
   const {data: attendees} = useEventProfiles(item.id);
 
   useEffect(() => {
@@ -71,6 +68,12 @@ const EventCard = ({item, navigation}: any) => {
     }
   }, [item.id, userFavourites]);
 
+  useEffect(() => {
+    if (item && item.awaiting_invite) {
+      setInvitesCount(item.awaiting_invite.length);
+    }
+  }, [item]);
+
   const handleAddToFavourite = () => {
     if (isFavourite) {
       removeUserFavourite.mutate(
@@ -79,7 +82,10 @@ const EventCard = ({item, navigation}: any) => {
           onSuccess: () => {
             setIsFavourite(false);
             queryClient.invalidateQueries([REMOVE_USER_FAVOURITE_QUERY_KEY]);
-            queryClient.invalidateQueries([EVENT_QUERY_KEY]);
+            queryClient.invalidateQueries([
+              GET_USER_FAVOURITES_QUERY_KEY,
+              user,
+            ]);
           },
         },
       );
@@ -90,15 +96,17 @@ const EventCard = ({item, navigation}: any) => {
           onSuccess: () => {
             setIsFavourite(true);
             queryClient.invalidateQueries([ADD_USER_FAVOURITE_QUERY_KEY]);
-            queryClient.invalidateQueries([EVENT_QUERY_KEY]);
+            queryClient.invalidateQueries([
+              GET_USER_FAVOURITES_QUERY_KEY,
+              user,
+            ]);
           },
         },
       );
     }
   };
 
-
-  const handleAddWait = useCallback(() => {
+  const handleAddWait = () => {
     if (!userProfileExist) {
       // ...Ваша логика с алертом...
     } else {
@@ -112,8 +120,8 @@ const EventCard = ({item, navigation}: any) => {
             onSuccess: () => {
               setAwaitingInvite(false);
               setInvitesCount((prevCount: number) => prevCount - 1);
-              setCurrentUserAttendee(null); // удаляем текущего пользователя из списка
               queryClient.invalidateQueries(['eventProfilesRemove', item.id]);
+              queryClient.invalidateQueries(['eventProfiles', item.id]);
             },
           },
         );
@@ -127,26 +135,21 @@ const EventCard = ({item, navigation}: any) => {
             onSuccess: () => {
               setAwaitingInvite(true);
               setInvitesCount((prevCount: number) => prevCount + 1);
-              // создаем объект пользователя для добавления его в список allAttendees
-              setCurrentUserAttendee({id: userProfile, image: /* указать здесь ссылку на изображение текущего пользователя */});
               queryClient.invalidateQueries(['eventProfilesAdd', item.id]);
+              queryClient.invalidateQueries(['eventProfiles', item.id]);
             },
           },
         );
       }
     }
-  }, [awaitingInvite, user, userProfileExist]);
+  };
 
   const allAttendeesData = attendees?.pages.flatMap(page => page.results) || [];
 
   let allAttendees = [...allAttendeesData];
 
-// добавляем текущего пользователя в список, если он участвует в мероприятии
-  if (currentUserAttendee && !allAttendees.some(attendee => attendee.id === currentUserAttendee)) {
-    allAttendees.unshift(currentUserAttendee);
-  }
-
   allAttendees = allAttendees.slice(0, 5);
+  console.log(allAttendees);
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#0000ff" />;

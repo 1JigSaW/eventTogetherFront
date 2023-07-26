@@ -6,7 +6,13 @@ import {
   useGetUserFavourites,
   useRemoveUserFavourite,
 } from '../queries/favourite';
-import React, { useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import {
   Alert,
   Image,
@@ -156,6 +162,7 @@ const EventScreen = ({navigation, route}: Props) => {
               setAwaitingInvite(false);
               setInvitesCount((prevCount: number) => prevCount - 1);
               queryClient.invalidateQueries(['eventProfilesRemove', eventId]);
+              queryClient.invalidateQueries(['eventProfiles', eventId]);
             },
           },
         );
@@ -170,6 +177,7 @@ const EventScreen = ({navigation, route}: Props) => {
               setAwaitingInvite(true);
               setInvitesCount((prevCount: number) => prevCount + 1);
               queryClient.invalidateQueries(['eventProfilesAdd', eventId]);
+              queryClient.invalidateQueries(['eventProfiles', eventId]);
             },
           },
         );
@@ -241,12 +249,16 @@ const EventScreen = ({navigation, route}: Props) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} >
       <View style={styles.insideBlock}>
         {eventData && eventData && (
           <>
             <ImageBackground
-              source={{uri: eventData.image.replace('image/upload/', '')}}
+              source={{
+                uri: eventData.image
+                  ? eventData.image.replace('image/upload/', '')
+                  : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
+              }}
               style={{height: 200, marginBottom: 5, marginTop: 10}}>
               <View
                 style={{
@@ -354,6 +366,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BLACK,
+    minHeight: 300,
   },
   insideBlock: {
     marginHorizontal: 8,

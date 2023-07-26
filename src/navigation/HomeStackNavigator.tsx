@@ -109,24 +109,27 @@ function HomeStack() {
         options={({navigation}) => ({
           headerTitle: 'Favourites',
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',
+            color: BLUE,
           },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 15,
+                marginTop: 2,
+                borderRadius: 35,
+                padding: 5,
+                backgroundColor: BLUE,
+              }}>
+              <LeftIcon size={15} color={BLACK} />
+            </Pressable>
           ),
         })}
       />

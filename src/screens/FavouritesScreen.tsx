@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native';
-import {BACKGROUND_MAIN} from '../../colors';
+import {BLACK} from '../../colors';
 import React, {useContext} from 'react';
 import View = Animated.View;
 import {UserContext} from '../../App';
@@ -39,35 +39,38 @@ const FavouritesScreen = ({navigation}: Props) => {
   const isLoading = isLoadingFavourites || isLoadingEvents;
   const isError = isErrorFavourites || isErrorEvents;
 
-  if (isError || !events) {
-    return (
-      <ScrollView style={styles.container}>
-        <Text>Error loading favourites or events...</Text>
-      </ScrollView>
-    );
-  }
+  // if (isError || !events) {
+  //   return (
+  //     <ScrollView style={styles.container}>
+  //       <Text>Error loading favourites or events...</Text>
+  //     </ScrollView>
+  //   );
+  // }
 
   return (
     <ScrollView style={styles.container}>
-      {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-      <View style={styles.insideBlock}>
-        {Array.isArray(events) &&
-          events.length > 0 ? (
-          events.map((event: Event, index: number) => (
-            <EventCard key={index} item={event} navigation={navigation} />
-          ))
-        ) : (
-          <Text>As long as you haven't added anything</Text>
-        )}
-      </View>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <View style={styles.insideBlock}>
+          {Array.isArray(events) && events.length > 0 ? (
+            events.map((event: Event, index: number) => (
+              <EventCard key={index} item={event} navigation={navigation} />
+            ))
+          ) : (
+            <Text>As long as you haven't added anything</Text>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
+
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   insideBlock: {
     marginHorizontal: 8,
