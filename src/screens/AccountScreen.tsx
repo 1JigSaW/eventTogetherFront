@@ -13,14 +13,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
-  BACKGROUND_MAIN, BLACK,
+  BEIGE,
+  BLACK,
   BLACK_MAIN,
+  BLUE,
   BLUE_MAIN,
+  GRAY_1, GRAY_2,
   GREEN_MAIN,
   RED_MAIN,
-  WHITE_MAIN
+  WHITE
 } from "../../colors";
 import ProfileIcon from '../components/icons/ProfileIcon';
 import {Bold, Regular} from '../../fonts';
@@ -48,6 +51,7 @@ import {
   PermissionStatus,
   request,
 } from 'react-native-permissions';
+import LogoutIcon from '../components/icons/LogoutIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
@@ -85,6 +89,16 @@ const AccountScreen = ({navigation}: Props) => {
   const updateUserProfileMutation = useUpdateUserProfile();
   const changePasswordMutation = useChangePassword();
   const updateUserProfilePicture = useUpdateUserProfilePicture();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable style={styles.headerRight} onPress={handleLogout}>
+          <LogoutIcon size={25} color={WHITE} />
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (userProfileDetailQuery.data) {
@@ -192,13 +206,13 @@ const AccountScreen = ({navigation}: Props) => {
     }
   };
 
-  async function handleLogout() {
+  const handleLogout = useCallback(async () => {
     await AsyncStorage.removeItem(USER);
     setUser(null);
     setUserProfile(null);
     setUserProfileExist(false);
     navigation.navigate('SignInScreen');
-  }
+  }, [navigation, setUser, setUserProfile, setUserProfileExist]);
 
   const requestStoragePermission = async () => {
     try {
@@ -305,6 +319,7 @@ const AccountScreen = ({navigation}: Props) => {
                       styles.error,
                   ]}
                   placeholder="First Name"
+                  placeholderTextColor={GRAY_1}
                   value={firstName}
                   onChangeText={text => {
                     setFirstName(text);
@@ -320,6 +335,7 @@ const AccountScreen = ({navigation}: Props) => {
                       styles.error,
                   ]}
                   placeholder="Second Name"
+                  placeholderTextColor={GRAY_1}
                   value={secondName}
                   onChangeText={text => {
                     setSecondName(text);
@@ -359,12 +375,14 @@ const AccountScreen = ({navigation}: Props) => {
                     !ageValid && age === '' && styles.error,
                   ]}
                   placeholder="Age"
+                  placeholderTextColor={GRAY_1}
                   value={age}
                   onChangeText={setAge}
                 />
                 <TextInput
                   style={styles.textInput}
                   placeholder="Description"
+                  placeholderTextColor={GRAY_1}
                   value={description}
                   onChangeText={setDescription}
                 />
@@ -380,6 +398,7 @@ const AccountScreen = ({navigation}: Props) => {
                 <TextInput
                   style={styles.textInput}
                   placeholder="Old password"
+                  placeholderTextColor={GRAY_1}
                   value={oldPassword}
                   onChangeText={setOldPassword}
                   secureTextEntry={true}
@@ -387,6 +406,7 @@ const AccountScreen = ({navigation}: Props) => {
                 <TextInput
                   style={styles.textInput}
                   placeholder="New password"
+                  placeholderTextColor={GRAY_1}
                   value={newPassword}
                   onChangeText={setNewPassword}
                   secureTextEntry={true}
@@ -395,9 +415,6 @@ const AccountScreen = ({navigation}: Props) => {
             </View>
             <Pressable style={styles.saveButtonBlock} onPress={handleSubmit}>
               <Text style={styles.saveButtonText}>Save</Text>
-            </Pressable>
-            <Pressable style={styles.logoutButtonBlock} onPress={handleLogout}>
-              <Text style={styles.logoutButtonText}>Logout</Text>
             </Pressable>
           </ScrollView>
         </View>
@@ -428,7 +445,7 @@ const styles = StyleSheet.create({
   // },
   infoText: {
     fontSize: 24,
-    color: BLACK_MAIN,
+    color: BLUE,
     fontFamily: Bold,
   },
   successSave: {
@@ -438,14 +455,15 @@ const styles = StyleSheet.create({
     color: GREEN_MAIN,
   },
   textInput: {
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: GRAY_2,
+    borderWidth: 1,
+    borderColor: GRAY_1,
     marginTop: 8,
     borderRadius: 15,
-    borderWidth: 1,
     lineHeight: 32,
     paddingHorizontal: 10,
     fontSize: 16,
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: Regular,
     paddingVertical: 4,
   },
@@ -453,7 +471,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   saveButtonBlock: {
-    backgroundColor: BLUE_MAIN,
+    backgroundColor: BLUE,
     alignItems: 'center',
     marginHorizontal: 12,
     marginBottom: 14,
@@ -492,6 +510,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 27,
     color: BLACK_MAIN,
+  },
+  headerRight: {
+    flexDirection: 'row',
+    marginRight: 12,
   },
 });
 

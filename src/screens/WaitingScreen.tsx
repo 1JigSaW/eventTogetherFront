@@ -1,18 +1,21 @@
 import React, {useContext} from 'react';
 import {UserContext} from '../../App';
-import { FlatList, Image, ListRenderItem, Pressable, StyleSheet, Text, View } from "react-native";
 import {
-  BACKGROUND_MAIN,
-  BLACK_MAIN,
-  ORANGE_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+  FlatList,
+  Image,
+  ListRenderItem,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { BEIGE, BLACK, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE, WHITE_MAIN } from "../../colors";
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useEventProfiles} from '../queries/event';
 import {UserProfileData} from '../api/userprofile';
-import ProfileIcon from '../components/icons/ProfileIcon';
 import {Bold, Regular} from '../../fonts';
+import PeopleOneIcon from '../components/icons/PeopleOneIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'WaitingScreen'>;
 
@@ -33,7 +36,9 @@ const WaitingScreen = ({navigation, route}: Props) => {
         <View style={styles.row}>
           <View>
             {!item.image ? (
-              <ProfileIcon size={200} />
+              <View style={styles.iconBackgroundBig}>
+                <PeopleOneIcon size={48} />
+              </View>
             ) : (
               <Image
                 source={{uri: image_url}}
@@ -110,14 +115,14 @@ const WaitingScreen = ({navigation, route}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   insideBlock: {
     marginHorizontal: 8,
   },
   block: {
     borderRadius: 15,
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: WHITE,
     borderWidth: 1,
     marginTop: 8,
     padding: 10,
@@ -139,10 +144,15 @@ const styles = StyleSheet.create({
   },
   buttonInvite: {
     borderRadius: 15,
-    backgroundColor: ORANGE_MAIN,
+    backgroundColor: BLUE,
     alignSelf: 'flex-end',
     paddingHorizontal: 10,
     paddingVertical: 5,
+  },
+  iconBackgroundBig: {
+    backgroundColor: BLUE,
+    borderRadius: 100,
+    padding: 15,
   },
 });
 

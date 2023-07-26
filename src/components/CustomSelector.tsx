@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import {BLACK_MAIN, ORANGE_MAIN, WHITE_MAIN} from '../../colors';
+import { BEIGE, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE_MAIN } from "../../colors";
 import CloseIcon from './icons/CloseIcon';
 import {Regular} from '../../fonts';
 
@@ -48,6 +48,7 @@ export const CustomSelector: React.FC<Props> = ({
           style={[styles.textInput, style]}
           autoCorrect={false}
           onChangeText={setQuery}
+          placeholderTextColor={GRAY_1}
           value={query}
           placeholder={placeholder}
         />
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   mainItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ORANGE_MAIN,
+    backgroundColor: BLUE,
     paddingHorizontal: 5,
     borderRadius: 15,
     margin: 3,
@@ -101,7 +102,8 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   textInput: {
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: GRAY_2,
+    borderColor: GRAY_1,
     borderRadius: 15,
     borderWidth: 1,
     lineHeight: 32,

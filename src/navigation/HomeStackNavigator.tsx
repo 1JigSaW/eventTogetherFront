@@ -1,29 +1,16 @@
 import {createStackNavigator} from '@react-navigation/stack';
-import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
-import SignInScreen from '../screens/SignInScreen';
-import React, {useContext, useEffect, useState} from 'react';
-import {Animated, Image, Pressable, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {Animated, Pressable, StyleSheet} from 'react-native';
 import View = Animated.View;
-import ProfileIcon from '../components/icons/ProfileIcon';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
 import {BACKGROUND_MAIN, BLACK, BLUE} from '../../colors';
 import FavouritesScreen from '../screens/FavouritesScreen';
-import AccountScreen from '../screens/AccountScreen';
 import WaitingScreen from '../screens/WaitingScreen';
-import MessageScreen from '../screens/MessageScreen';
-import ChatScreen from '../screens/ChatScreen';
 import EventScreen from '../screens/EventScreen';
 import FindSwipeScreen from '../screens/FindSwipeScreen';
-import {useUserProfileDetail} from '../queries/userprofile';
-import {UserContext} from '../../App';
-import {useFocusEffect} from '@react-navigation/native';
 import LeftIcon from '../components/icons/LeftIcon';
-import BookmarkAddIcon from '../components/icons/BookmarkAddIcon';
-import BookmarkIcon from '../components/icons/BookmarkIcon';
-import UserCheckIcon from '../components/icons/UserCheckIcon';
-import UserPlusIcon from '../components/icons/UserPlusIcon';
 
 const HomeStackNavigator = createStackNavigator<HomeStackParamList>();
 
@@ -57,8 +44,6 @@ export type HomeStackParamList = {
 };
 
 function HomeStack() {
-  const [isFavourite, setIsFavourite] = useState(false);
-  const [awaitingInvite, setAwaitingInvite] = useState<boolean>(false);
 
   return (
     <HomeStackNavigator.Navigator>
@@ -82,26 +67,6 @@ function HomeStack() {
         options={{
           headerShown: false,
         }}
-        // options={({navigation}) => ({
-        //   headerTitle: '',
-        //   headerStyle: {
-        //     backgroundColor: BACKGROUND_MAIN,
-        //     borderBottomWidth: 0,
-        //     elevation: 0,
-        //     shadowOpacity: 0,
-        //   },
-        //   headerRight: () => (
-        //     <View style={styles.headerRight}>
-        //       <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-        //         <MessagesIcon size={100} style={styles.headerRightOne} />
-        //       </Pressable>
-        //       <Pressable
-        //         onPress={() => navigation.navigate('FavouritesScreen')}>
-        //         <FavouritesIcon size={100} />
-        //       </Pressable>
-        //     </View>
-        //   ),
-        // })}
       />
       <HomeStackNavigator.Screen
         name={'FavouritesScreen'}
@@ -139,24 +104,27 @@ function HomeStack() {
         options={({navigation}) => ({
           headerTitle: 'Waiting list',
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',
+            color: BLUE,
           },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 15,
+                marginTop: 2,
+                borderRadius: 35,
+                padding: 5,
+                backgroundColor: BLUE,
+              }}>
+              <LeftIcon size={15} color={BLACK} />
+            </Pressable>
           ),
         })}
       />
