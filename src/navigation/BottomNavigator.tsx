@@ -6,6 +6,9 @@ import ChatIcon from '../components/icons/ChatIcon';
 import ChatStackNavigator from './ChatStackNavigator';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import AccountStackNavigator from './AccountStackNavigator';
+import { Alert } from "react-native";
+import { useContext } from "react";
+import { UserContext } from "../../App";
 
 export type BottomNavigatorParamsList = {
   HomeTab: undefined;
@@ -16,6 +19,7 @@ export type BottomNavigatorParamsList = {
 const BottomTab = createBottomTabNavigator<BottomNavigatorParamsList>();
 
 const BottomTabNavigator = () => {
+  const {userProfileExist} = useContext(UserContext);
   return (
     <BottomTab.Navigator
       screenOptions={{
@@ -48,6 +52,28 @@ const BottomTabNavigator = () => {
       <BottomTab.Screen
         name="ChatTab"
         component={ChatStackNavigator}
+        listeners={({navigation}) => ({
+          tabPress: event => {
+            if (userProfileExist) {
+              event.preventDefault();
+              navigation.navigate('ChatTab');
+            } else {
+              Alert.alert('Profile not found', 'Create your profile first', [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Go to Profile',
+                  onPress: () => {
+                    navigation.navigate('AccountScreen');
+                  },
+                },
+              ]);
+              event.preventDefault();
+            }
+          },
+        })}
         options={{
           title: 'Chat',
           tabBarIcon: ({focused}) => (

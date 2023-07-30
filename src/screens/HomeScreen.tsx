@@ -158,55 +158,63 @@ const HomeScreen = ({navigation}: Props) => {
             value={search}
           />
         </View>
-        <View style={{marginTop: 3}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Text style={styles.titleFavourites}>My favourites</Text>
-            {userFavourites && userFavourites.length > 4 && (
+        {userFavourites && userFavourites.length > 4 && (
+          <View style={{marginTop: 3}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.titleFavourites}>My favourites</Text>
+
               <Pressable
                 onPress={() => navigation.navigate('FavouritesScreen')}>
                 <Text style={styles.titleFavourites}>See all</Text>
               </Pressable>
-            )}
+            </View>
+            <View style={[styles.row2, {minHeight: 90}]}>
+              {isLoadingEvents ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                Array.isArray(events) &&
+                events?.map((event: any, index: number) => (
+                  <Pressable
+                    key={index}
+                    style={styles.eventContainer}
+                    onPress={() =>
+                      navigation.navigate('EventScreen', {event: event.id})
+                    }>
+                    {event.image ? (
+                      <Image
+                        source={{
+                          uri: event.image
+                            ? event.image.replace('image/upload/', '')
+                            : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
+                        }}
+                        resizeMode="contain"
+                        style={styles.eventImage}
+                      />
+                    ) : (
+                      <Image
+                        source={{
+                          uri: event.image
+                            ? event.image.replace('image/upload/', '')
+                            : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
+                        }}
+                        resizeMode="contain"
+                        style={styles.eventImage}
+                      />
+                    )}
+                    <Text style={styles.eventTitle}>
+                      {new Date(event.date).toLocaleDateString()}
+                    </Text>
+                  </Pressable>
+                ))
+              )}
+            </View>
           </View>
-          <View style={[styles.row2, {minHeight: 90}]}>
-            {isLoadingEvents ? (
-              <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-              events?.map((event: any, index: number) => (
-                <Pressable
-                  key={index}
-                  style={styles.eventContainer}
-                  onPress={() =>
-                    navigation.navigate('EventScreen', {event: event.id})
-                  }>
-                  {event.image ? (
-                    <Image
-                      source={{
-                        uri: event.image
-                          ? event.image.replace('image/upload/', '')
-                          : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
-                      }}
-                      resizeMode="contain"
-                      style={styles.eventImage}
-                    />
-                  ) : (
-                    <View style={styles.placeholderImage} />
-                  )}
-                  <Text style={styles.eventTitle}>
-                    {new Date(event.date).toLocaleDateString()}
-                  </Text>
-                </Pressable>
-              ))
-            )}
-          </View>
-
-        </View>
-
+        )}
         {!searchResults?.length && search.length > 2 ? (
           <Text style={styles.notFoundText}>{noResultsMessage}</Text>
         ) : (

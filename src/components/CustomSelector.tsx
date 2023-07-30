@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { BEIGE, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE_MAIN } from "../../colors";
+import { BEIGE, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE, WHITE_MAIN } from "../../colors";
 import CloseIcon from './icons/CloseIcon';
 import {Regular} from '../../fonts';
 
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     paddingHorizontal: 10,
     fontSize: 16,
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: Regular,
     paddingVertical: 4,
     height: 40,

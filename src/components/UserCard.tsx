@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
-import {BLACK_MAIN, ORANGE_MAIN, WHITE_MAIN} from '../../colors';
+import { BLACK, BLACK_MAIN, BLUE, GRAY_1, ORANGE_MAIN, WHITE, WHITE_MAIN } from "../../colors";
 import {Regular} from '../../fonts';
 import LanguageIcon from './icons/LanguageIcon';
 import BirthIcon from './icons/BirthIcon';
@@ -26,20 +26,22 @@ const UserCard = ({user}: any) => (
     <Text style={styles.firstNameText}>{user.last_name}</Text>
     <View style={styles.insideBlock}>
       <View style={styles.row}>
-        <LanguageIcon size={100} color={BLACK_MAIN} />
+        <LanguageIcon size={100} color={WHITE} />
         <Text style={styles.insideText}>
           {user.language && user.language.join(', ')}
         </Text>
       </View>
       <View style={[styles.row, {marginTop: 14}]}>
-        <BirthIcon size={100} />
+        <BirthIcon size={100} color={WHITE} />
         <Text style={styles.insideText}>{user.age}</Text>
       </View>
       <View style={[styles.row, {marginTop: 14}]}>
-        <StarIcon size={100} style={{marginRight: 13}} />
+        <StarIcon size={100} style={{marginRight: 13}} color={WHITE} />
         {user.interests.map((item: string, index: number) => (
           <View style={styles.interests}>
-            <Text key={index} style={[styles.insideText, {marginLeft: 0}]}>
+            <Text
+              key={index}
+              style={[styles.insideText, {marginLeft: 0, color: BLACK}]}>
               {item}
             </Text>
           </View>
@@ -47,8 +49,10 @@ const UserCard = ({user}: any) => (
       </View>
       {user.description && (
         <View style={[styles.row, {marginTop: 14}]}>
-          <DescriptionIcon size={100} />
-          <Text style={styles.insideText}>{user.description}</Text>
+          <DescriptionIcon size={100} color={WHITE} />
+          <Text style={styles.insideText}>
+            {user.description}
+          </Text>
         </View>
       )}
     </View>
@@ -57,14 +61,15 @@ const UserCard = ({user}: any) => (
 
 const styles = StyleSheet.create({
   userBlock: {
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: BLACK,
     borderRadius: 15,
     borderWidth: 1,
+    borderColor: GRAY_1,
   },
   firstNameText: {
     alignSelf: 'center',
     fontSize: 32,
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: Regular,
   },
   row: {
@@ -73,7 +78,7 @@ const styles = StyleSheet.create({
   },
   insideText: {
     marginLeft: 13,
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: Regular,
     fontSize: 24,
   },
@@ -83,7 +88,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
   },
   interests: {
-    backgroundColor: ORANGE_MAIN,
+    backgroundColor: BLUE,
     borderRadius: 15,
     marginRight: 4,
     paddingHorizontal: 8,

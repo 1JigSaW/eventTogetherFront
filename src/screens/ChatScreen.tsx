@@ -1,5 +1,11 @@
 import React, {useEffect, useContext, useState, useLayoutEffect} from 'react';
-import {Bubble, GiftedChat, IMessage} from 'react-native-gifted-chat';
+import {
+  Bubble,
+  Composer,
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+} from 'react-native-gifted-chat';
 import SocketIOClient from 'socket.io-client';
 import {queryClient, UserContext} from '../../App';
 import {
@@ -12,8 +18,8 @@ import {
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MessageData} from '../api/chat.api';
-import {StyleSheet, View} from 'react-native';
-import {BACKGROUND_MAIN} from '../../colors';
+import {View} from 'react-native';
+import {BLACK, GRAY_1} from '../../colors';
 
 type Props = StackScreenProps<HomeStackParamList, 'ChatScreen'>;
 
@@ -149,7 +155,7 @@ const ChatScreen = ({navigation, route}: Props) => {
   }, [chat, socket]);
 
   return (
-    <View style={{flex: 1, width: '100%', backgroundColor: BACKGROUND_MAIN}}>
+    <View style={{flex: 1, width: '100%', backgroundColor: BLACK}}>
       <GiftedChat
         messages={
           messages.map((message: PostMessage) => ({
@@ -169,26 +175,33 @@ const ChatScreen = ({navigation, route}: Props) => {
             wrapperStyle={{
               left: {
                 borderWidth: 1,
-                backgroundColor: '#ffffff',
+                backgroundColor: BLACK,
                 marginLeft: -40,
               },
               right: {
                 borderWidth: 1,
-                backgroundColor: '#0099ff',
+                backgroundColor: GRAY_1,
               },
             }}
+          />
+        )}
+        renderInputToolbar={props => (
+          <InputToolbar
+            {...props}
+            containerStyle={{
+              backgroundColor: BLACK,
+            }}
+            renderComposer={composerProps => (
+              <Composer
+                {...composerProps}
+                textInputStyle={{color: 'white'}} // Установка цвета текста
+              />
+            )}
           />
         )}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
-  },
-});
 
 export default ChatScreen;

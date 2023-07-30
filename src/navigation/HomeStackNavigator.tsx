@@ -44,7 +44,6 @@ export type HomeStackParamList = {
 };
 
 function HomeStack() {
-
   return (
     <HomeStackNavigator.Navigator>
       {/*<HomeStackNavigator.Screen*/}
@@ -132,10 +131,10 @@ function HomeStack() {
         name={'EventScreen'}
         component={EventScreen}
         options={({navigation}) => ({
-          headerTransparent: true,
           headerTitle: '',
+          headerTransparent: true,
           headerStyle: {
-            backgroundColor: 'transparent',
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
@@ -148,17 +147,31 @@ function HomeStack() {
       <HomeStackNavigator.Screen
         name={'FindSwipeScreen'}
         component={FindSwipeScreen}
-        options={() => ({
+        options={({navigation}) => ({
           headerTitle: '',
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',
+            color: BLUE,
           },
+          headerLeft: () => (
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{
+                marginLeft: 15,
+                marginTop: 2,
+                borderRadius: 35,
+                padding: 5,
+                backgroundColor: BLUE,
+              }}>
+              <LeftIcon size={15} color={BLACK} />
+            </Pressable>
+          ),
         })}
       />
     </HomeStackNavigator.Navigator>

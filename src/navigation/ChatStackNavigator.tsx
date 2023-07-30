@@ -1,11 +1,13 @@
 import {createStackNavigator} from '@react-navigation/stack';
-import {BACKGROUND_MAIN} from '../../colors';
+import { BACKGROUND_MAIN, BLACK, BLUE } from "../../colors";
 import {Pressable, StyleSheet, View} from 'react-native';
 import MessagesIcon from '../components/icons/MessagesIcon';
 import FavouritesIcon from '../components/icons/FavouritesIcon';
 import MessageScreen from '../screens/MessageScreen';
 import ChatScreen from '../screens/ChatScreen';
-import React from 'react';
+import React, { useContext } from "react";
+import LeftIcon from '../components/icons/LeftIcon';
+import { UserContext } from "../../App";
 
 const ChatStackNavigator = createStackNavigator<ChatStackParamList>();
 
@@ -19,30 +21,24 @@ export type ChatStackParamList = {
 };
 
 function ChatStack() {
+  const {userProfileExist} = useContext(UserContext);
   return (
     <ChatStackNavigator.Navigator>
       <ChatStackNavigator.Screen
         name={'MessageScreen'}
         component={MessageScreen}
         options={({navigation}) => ({
-          headerTitle: 'Messages',
+          headerTitle: 'Chats',
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',
+            color: BLUE,
           },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
-          ),
         })}
       />
       <ChatStackNavigator.Screen
@@ -50,24 +46,29 @@ function ChatStack() {
         component={ChatScreen}
         options={({navigation}) => ({
           headerStyle: {
-            backgroundColor: BACKGROUND_MAIN,
+            backgroundColor: BLACK,
             borderBottomWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             textAlign: 'center',
+            color: BLUE,
           },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <Pressable onPress={() => navigation.navigate('MessageScreen')}>
-                <MessagesIcon size={100} style={styles.headerRightOne} />
-              </Pressable>
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <FavouritesIcon size={100} />
-              </Pressable>
-            </View>
+          headerLeft: () => (
+            <Pressable
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={{
+                marginLeft: 15,
+                marginTop: 2,
+                borderRadius: 35,
+                padding: 5,
+                backgroundColor: BLUE,
+              }}>
+              <LeftIcon size={15} color={BLACK} />
+            </Pressable>
           ),
         })}
       />

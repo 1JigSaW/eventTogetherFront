@@ -18,7 +18,11 @@ export const useCreateUser = () => {
     {
       onError: error => {
         if (error.response && error.response.status === 400) {
-          console.error(error.response.data.email);
+          if (error.response.data.detail) {
+            console.error(error.response.data.detail);
+          } else {
+            console.error(error.response.data);
+          }
         } else {
           console.error(error);
         }

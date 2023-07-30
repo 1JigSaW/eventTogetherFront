@@ -7,13 +7,13 @@ import TinderCard from 'react-tinder-card';
 import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useMatchUsers} from '../queries/match';
 import {
-  BACKGROUND_MAIN,
-  BLACK_MAIN,
-  BLUE_MAIN,
+  BACKGROUND_MAIN, BLACK,
+  BLACK_MAIN, BLUE,
+  BLUE_MAIN, GRAY_1, GRAY_2,
   ORANGE_MAIN,
-  RED_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+  RED_MAIN, WHITE,
+  WHITE_MAIN
+} from "../../colors";
 import {Regular} from '../../fonts';
 import {useAddUserToEvent, useRemoveUserFromEvent} from '../queries/event';
 
@@ -98,7 +98,7 @@ const FindSwipeScreen = ({route, navigation}: Props) => {
         <Pressable
           style={[
             styles.emptyButton,
-            awaitingInvite && {backgroundColor: ORANGE_MAIN},
+            awaitingInvite && {backgroundColor: GRAY_1},
           ]}
           onPress={handleAddWait}>
           {!awaitingInvite ? (
@@ -165,15 +165,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   noMoreUsersText: {
     fontSize: 24,
     marginBottom: 12,
+    fontFamily: Regular,
+    color: WHITE,
   },
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 20,
@@ -187,11 +189,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 50,
     borderRadius: 30,
+    marginHorizontal: 3,
   },
   buttonText: {
     fontFamily: Regular,
     fontSize: 32,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   insideBlock: {
     marginHorizontal: 32,
@@ -201,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyButton: {
-    backgroundColor: BLUE_MAIN,
+    backgroundColor: BLUE,
     paddingVertical: 10,
     paddingHorizontal: 27,
     borderRadius: 30,
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
   textButton: {
     fontSize: 20,
     fontFamily: Regular,
-    color: BLACK_MAIN,
+    color: BLACK,
     alignSelf: 'center',
   },
 });

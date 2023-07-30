@@ -92,7 +92,7 @@ const WaitingScreen = ({navigation, route}: Props) => {
                 event: event,
               })
             }>
-            <Text style={styles.textAddition}>Invite</Text>
+            <Text style={[styles.textAddition, {color: BLACK}]}>Invite</Text>
           </Pressable>
         )}
       </View>
@@ -122,22 +122,23 @@ const styles = StyleSheet.create({
   },
   block: {
     borderRadius: 15,
-    backgroundColor: WHITE,
+    backgroundColor: GRAY_2,
     borderWidth: 1,
     marginTop: 8,
     padding: 10,
+    borderColor: GRAY_1,
   },
   row: {
     flexDirection: 'row',
   },
   textName: {
-    color: BLACK_MAIN,
+    color: WHITE,
     fontSize: 15,
     fontFamily: Bold,
     lineHeight: 20,
   },
   textAddition: {
-    color: BLACK_MAIN,
+    color: WHITE,
     fontSize: 15,
     fontFamily: Regular,
     lineHeight: 20,

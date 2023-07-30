@@ -3,10 +3,18 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useUserChats} from '../queries/chat';
 import {UserContext} from '../../App';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import {BACKGROUND_MAIN, BLACK_MAIN, BLUE_MAIN, WHITE_MAIN} from '../../colors';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {BLACK, BLUE, GRAY_1, GRAY_2, WHITE} from '../../colors';
 import {Black, Bold, Regular, SemiBold} from '../../fonts';
 import ProfileIcon from '../components/icons/ProfileIcon';
+import PeopleOneIcon from '../components/icons/PeopleOneIcon';
 
 type Props = StackScreenProps<HomeStackParamList, 'MessageScreen'>;
 
@@ -33,7 +41,7 @@ function MessageScreen({navigation}: Props) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
         {messages.map(message => (
           <Pressable
@@ -47,17 +55,20 @@ function MessageScreen({navigation}: Props) {
             <Text style={[styles.textEvent, {fontFamily: Black}]}>
               {message.chat.event.title}
             </Text>
-            {message.chat.user1.id !== userProfile ? (
-              <Text style={styles.textEvent}>
-                To: {message.chat.user1.first_name}{' '}
-                {message.chat.user1.last_name}
-              </Text>
-            ) : (
-              <Text style={styles.textEvent}>
-                To: {message.chat.user2.first_name}{' '}
-                {message.chat.user2.last_name}
-              </Text>
-            )}
+            <Text style={[styles.textEvent, {fontFamily: Black}]}>
+              {new Date(message.chat.event.date).toLocaleDateString()}
+            </Text>
+            {/*{message.chat.user1.id !== userProfile ? (*/}
+            {/*  <Text style={styles.textEvent}>*/}
+            {/*    To: {message.chat.user1.first_name}{' '}*/}
+            {/*    {message.chat.user1.last_name}*/}
+            {/*  </Text>*/}
+            {/*) : (*/}
+            {/*  <Text style={styles.textEvent}>*/}
+            {/*    To: {message.chat.user2.first_name}{' '}*/}
+            {/*    {message.chat.user2.last_name}*/}
+            {/*  </Text>*/}
+            {/*)}*/}
             <View style={styles.row}>
               {message.chat.user1.id === userProfile ? (
                 message.chat.user2.image ? (
@@ -71,7 +82,9 @@ function MessageScreen({navigation}: Props) {
                     style={{width: 40, height: 40, borderRadius: 125}}
                   />
                 ) : (
-                  <ProfileIcon size={100} />
+                  <View style={styles.iconBackground}>
+                    <PeopleOneIcon size={20} />
+                  </View>
                 )
               ) : message.chat.user1.image ? (
                 <Image
@@ -81,7 +94,9 @@ function MessageScreen({navigation}: Props) {
                   style={{width: 40, height: 40, borderRadius: 125}}
                 />
               ) : (
-                <ProfileIcon size={100} />
+                <View style={styles.iconBackground}>
+                  <PeopleOneIcon size={20} />
+                </View>
               )}
               <View style={styles.messageBlock}>
                 <Text style={styles.textName}>
@@ -93,31 +108,35 @@ function MessageScreen({navigation}: Props) {
           </Pressable>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   insideBlock: {
     marginHorizontal: 8,
   },
   block: {
     borderRadius: 15,
-    backgroundColor: WHITE_MAIN,
-    borderWidth: 1,
+    backgroundColor: BLACK,
     marginTop: 8,
     padding: 10,
+    borderWidth: 1,
+    borderColor: GRAY_1,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 5,
   },
   messageBlock: {
-    backgroundColor: BLUE_MAIN,
+    backgroundColor: GRAY_2,
+    borderWidth: 1,
+    borderColor: GRAY_1,
     width: '85%',
     marginLeft: 10,
     paddingHorizontal: 10,
@@ -127,17 +146,22 @@ const styles = StyleSheet.create({
   textName: {
     fontSize: 15,
     fontFamily: Bold,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   textMessage: {
     fontFamily: Regular,
     fontSize: 15,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   textEvent: {
     fontFamily: SemiBold,
     fontSize: 15,
-    color: BLACK_MAIN,
+    color: WHITE,
+  },
+  iconBackground: {
+    backgroundColor: BLUE,
+    borderRadius: 30,
+    padding: 11,
   },
 });
 

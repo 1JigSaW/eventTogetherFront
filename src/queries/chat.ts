@@ -68,6 +68,8 @@ export const useGetChatId = (
     () => ChatApi.getChatId(senderId, recipientId, eventId),
     {
       retry: 0,
+      onError: () => {},
     },
   );
 };
+

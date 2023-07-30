@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -11,11 +11,13 @@ import {
 } from 'react-native';
 import View = Animated.View;
 import {
-  BACKGROUND_MAIN,
+  BLACK,
   BLACK_MAIN,
-  BLUE_MAIN,
+  BLUE,
+  GRAY_1,
+  GRAY_2,
   GRAY_MAIN,
-  WHITE_MAIN,
+  WHITE,
 } from '../../colors';
 import {Bold, Regular, SemiBold} from '../../fonts';
 import {useCreateUser} from '../queries/user';
@@ -23,7 +25,7 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from '../../constants';
-import { UserContext } from "../../App";
+import {UserContext} from '../../App';
 
 type Props = StackScreenProps<HomeStackParamList, 'SignUpScreen'>;
 
@@ -33,7 +35,7 @@ const SignUpScreen = ({navigation}: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [isLoginTouched, setIsLoginTouched] = useState(false);
@@ -54,7 +56,13 @@ const SignUpScreen = ({navigation}: Props) => {
     };
 
     checkUser();
-  }, [navigation]);
+  }, [navigation, setUser]);
+
+  const validateEmail = (email: string) => {
+    let re =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  };
 
   const handleSendData = () => {
     setIsLoginTouched(true);
@@ -62,32 +70,55 @@ const SignUpScreen = ({navigation}: Props) => {
     setIsPasswordTouched(true);
     setIsRepeatPasswordTouched(true);
 
-    if (
-      login &&
-      email &&
-      password &&
-      repeatPassword &&
-      password === repeatPassword
-    ) {
-      createUserMutation.mutate(
-        {username: login, email: email, password: password},
-        {
-          onSuccess: async data => {
-            try {
-              // Сохраняем данные пользователя в AsyncStorage
-              await AsyncStorage.setItem(USER, JSON.stringify(data));
-              // setUser(data.user);
-              navigation.navigate('HomeScreen');
-            } catch (e) {
-              console.error(e);
-            }
-          },
-          onError: error => {
-            setErrorMessage(error?.response?.data.email);
-          },
-        },
-      );
+    if (!login) {
+      setErrorMessage('Please provide a username');
+      return;
     }
+
+    if (!validateEmail(email)) {
+      setErrorMessage('Invalid email format');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage('Password should be at least 6 characters long');
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
+
+    setErrorMessage(null);
+    createUserMutation.mutate(
+      {username: login, email: email, password: password},
+      {
+        onSuccess: async data => {
+          console.log(data);
+          if (data.id) {
+            console.log(data.id);
+            setUser(data.id);
+            await AsyncStorage.setItem(USER, JSON.stringify(data.id));
+            setUser(data.id);
+          }
+        },
+        onError: error => {
+          if (error.response && error.response.status === 400) {
+            let errorMessage = 'Something went wrong.';
+            if (error.response.data.username) {
+              errorMessage = error.response.data.username.join(' ');
+            }
+            if (error.response.data.email) {
+              errorMessage = error.response.data.email.join(' ');
+            }
+            setErrorMessage(errorMessage);
+          } else {
+            setErrorMessage(error.message);
+          }
+        },
+      },
+    );
   };
 
   const handleModalClose = () => {
@@ -126,6 +157,7 @@ const SignUpScreen = ({navigation}: Props) => {
           <TextInput
             style={[styles.textInputLogin]}
             placeholder="Login"
+            placeholderTextColor={GRAY_1}
             onChangeText={text => {
               setLogin(text);
               setIsLoginTouched(true);
@@ -135,6 +167,7 @@ const SignUpScreen = ({navigation}: Props) => {
           <TextInput
             style={[styles.textInputOther]}
             placeholder="Email"
+            placeholderTextColor={GRAY_1}
             onChangeText={text => {
               setEmail(text);
               setIsEmailTouched(true);
@@ -144,39 +177,34 @@ const SignUpScreen = ({navigation}: Props) => {
           <TextInput
             style={[styles.textInputOther]}
             placeholder="Password"
+            placeholderTextColor={GRAY_1}
             onChangeText={text => {
               setPassword(text);
               setIsPasswordTouched(true);
             }}
             value={password}
+            secureTextEntry={true}
           />
           <TextInput
             style={[styles.textInputOther]}
             placeholder="Repeat password"
+            placeholderTextColor={GRAY_1}
             onChangeText={text => {
               setRepeatPassword(text);
               setIsRepeatPasswordTouched(true);
             }}
             value={repeatPassword}
+            secureTextEntry={true}
           />
           <Pressable
             style={[
               styles.buttonCreate,
               !(login && email && password && repeatPassword) && {
-                backgroundColor: GRAY_MAIN,
                 opacity: 0.2,
               },
             ]}
             onPress={handleSendData}
-            disabled={
-              !(
-                login &&
-                email &&
-                password &&
-                repeatPassword &&
-                password === repeatPassword
-              )
-            }>
+            disabled={!(login && email && password && repeatPassword)}>
             <Text style={styles.buttonText}>Create</Text>
           </Pressable>
           <Pressable onPress={() => navigation.navigate('SignInScreen')}>
@@ -191,7 +219,7 @@ const SignUpScreen = ({navigation}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   content: {
     flex: 1,
@@ -208,18 +236,19 @@ const styles = StyleSheet.create({
   },
   centerBlock: {
     width: 335,
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: BLACK,
     marginBottom: 20,
     borderRadius: 15,
     borderWidth: 1,
     alignItems: 'center',
     padding: 10,
+    borderColor: GRAY_1,
   },
   titleSignUp: {
     fontFamily: Bold,
     fontSize: 36,
     lineHeight: 42,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   textInputLogin: {
     marginTop: 36,
@@ -231,7 +260,9 @@ const styles = StyleSheet.create({
     fontFamily: Regular,
     fontSize: 24,
     lineHeight: 28,
-    color: BLACK_MAIN,
+    color: WHITE,
+    backgroundColor: GRAY_2,
+    borderColor: GRAY_1,
   },
   placeholder: {
     fontFamily: Regular,
@@ -249,7 +280,9 @@ const styles = StyleSheet.create({
     fontFamily: Regular,
     fontSize: 24,
     lineHeight: 28,
-    color: BLACK_MAIN,
+    color: WHITE,
+    backgroundColor: GRAY_2,
+    borderColor: GRAY_1,
   },
   buttonCreate: {
     marginTop: 41,
@@ -258,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: BLUE_MAIN,
+    backgroundColor: BLUE,
     alignItems: 'center',
     opacity: 1,
   },
@@ -272,7 +305,7 @@ const styles = StyleSheet.create({
     fontFamily: SemiBold,
     fontSize: 18,
     lineHeight: 21,
-    color: BLUE_MAIN,
+    color: BLUE,
     marginTop: 12,
   },
   centeredView: {

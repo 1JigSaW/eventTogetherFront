@@ -211,8 +211,7 @@ const AccountScreen = ({navigation}: Props) => {
     setUser(null);
     setUserProfile(null);
     setUserProfileExist(false);
-    navigation.navigate('SignInScreen');
-  }, [navigation, setUser, setUserProfile, setUserProfileExist]);
+  }, [setUser, setUserProfile, setUserProfileExist]);
 
   const requestStoragePermission = async () => {
     try {

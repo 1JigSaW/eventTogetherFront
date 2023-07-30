@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Animated,
   Modal,
@@ -8,13 +8,7 @@ import {
   Text,
   TextInput,
 } from 'react-native';
-import {
-  BACKGROUND_MAIN,
-  BLACK_MAIN,
-  BLUE_MAIN,
-  GRAY_MAIN,
-  WHITE_MAIN,
-} from '../../colors';
+import {BLACK, BLUE, GRAY_1, GRAY_2, WHITE} from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import View = Animated.View;
@@ -29,13 +23,31 @@ type Props = StackScreenProps<HomeStackParamList, 'SignInScreen'>;
 const SignInScreen = ({navigation}: Props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const {setUser} = useContext(UserContext);
 
   const loginUserMutation = useLoginUser();
 
   function handleSendData() {
-    loginUserMutation.mutate({email, password});
+    if (!validateEmail(email)) {
+      setErrorMessage('Invalid email format');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage('Password should be at least 6 characters long');
+      return;
+    }
+
+    setErrorMessage(null);
+    loginUserMutation.mutate(
+      {email, password},
+      {
+        onError: error => {
+          setErrorMessage(error?.response?.data.message || error.message);
+        },
+      },
+    );
   }
 
   useEffect(() => {
@@ -43,14 +55,12 @@ const SignInScreen = ({navigation}: Props) => {
       try {
         AsyncStorage.setItem(USER, loginUserMutation.data.userId.toString());
         setUser(loginUserMutation.data.userId);
-        navigation.navigate('HomeScreen');
-      } catch (e) {
-        console.error(e);
+        // navigation.navigate('HomeScreen');
+      } catch (e: any) {
+        setErrorMessage(e);
       }
     }
   }, [
-    loginUserMutation.error,
-    loginUserMutation.isError,
     loginUserMutation.isSuccess,
     loginUserMutation.data,
     navigation,
@@ -59,6 +69,12 @@ const SignInScreen = ({navigation}: Props) => {
 
   const handleModalClose = () => {
     setErrorMessage(null); // Clear error message
+  };
+
+  const validateEmail = (email: string) => {
+    let re =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
   };
 
   return (
@@ -85,18 +101,16 @@ const SignInScreen = ({navigation}: Props) => {
           <TextInput
             style={[styles.textInputEmail]}
             placeholder="Email"
-            onChangeText={text => {
-              setEmail(text);
-            }}
+            placeholderTextColor={GRAY_1}
+            onChangeText={text => setEmail(text)}
             value={email}
           />
           <TextInput
             style={[styles.textInputOther]}
             placeholder="Password"
-            onChangeText={text => {
-              setPassword(text);
-            }}
+            onChangeText={text => setPassword(text)}
             value={password}
+            placeholderTextColor={GRAY_1}
             secureTextEntry={true}
           />
           <Pressable
@@ -108,7 +122,6 @@ const SignInScreen = ({navigation}: Props) => {
             style={[
               styles.buttonCreate,
               !(email && password) && {
-                backgroundColor: GRAY_MAIN,
                 opacity: 0.2,
               },
             ]}
@@ -128,7 +141,7 @@ const SignInScreen = ({navigation}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND_MAIN,
+    backgroundColor: BLACK,
   },
   content: {
     flex: 1,
@@ -145,20 +158,22 @@ const styles = StyleSheet.create({
   },
   centerBlock: {
     width: 335,
-    backgroundColor: WHITE_MAIN,
+    backgroundColor: BLACK,
     marginBottom: 20,
     borderRadius: 15,
     borderWidth: 1,
     alignItems: 'center',
     padding: 10,
+    borderColor: GRAY_1,
   },
   titleSignIn: {
     fontFamily: Bold,
     fontSize: 36,
     lineHeight: 42,
-    color: BLACK_MAIN,
+    color: WHITE,
   },
   textInputEmail: {
+    backgroundColor: GRAY_2,
     marginTop: 36,
     borderWidth: 1,
     width: '97%',
@@ -168,15 +183,17 @@ const styles = StyleSheet.create({
     fontFamily: Regular,
     fontSize: 24,
     lineHeight: 28,
-    color: BLACK_MAIN,
+    color: WHITE,
+    borderColor: GRAY_1,
   },
   placeholder: {
     fontFamily: Regular,
     fontSize: 24,
     lineHeight: 28,
-    color: GRAY_MAIN,
+    color: GRAY_1,
   },
   textInputOther: {
+    backgroundColor: GRAY_2,
     marginTop: 10,
     borderWidth: 1,
     width: '97%',
@@ -186,7 +203,8 @@ const styles = StyleSheet.create({
     fontFamily: Regular,
     fontSize: 24,
     lineHeight: 28,
-    color: BLACK_MAIN,
+    color: WHITE,
+    borderColor: GRAY_1,
   },
   buttonCreate: {
     marginTop: 41,
@@ -195,7 +213,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: BLUE_MAIN,
+    backgroundColor: BLUE,
     alignItems: 'center',
     opacity: 1,
   },
@@ -203,13 +221,13 @@ const styles = StyleSheet.create({
     fontFamily: SemiBold,
     fontSize: 24,
     lineHeight: 28,
-    color: BLACK_MAIN,
+    color: BLACK,
   },
   additionButton: {
     fontFamily: SemiBold,
     fontSize: 18,
     lineHeight: 21,
-    color: BLUE_MAIN,
+    color: BLUE,
     marginTop: 12,
   },
   forgotPasswordButton: {
@@ -218,7 +236,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   forgotPasswordText: {
-    color: BLACK_MAIN,
+    color: WHITE,
     fontFamily: SemiBold,
     fontSize: 14,
   },
@@ -234,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: WHITE,
     shadowOffset: {
       width: 0,
       height: 2,

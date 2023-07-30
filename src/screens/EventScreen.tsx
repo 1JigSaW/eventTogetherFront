@@ -249,7 +249,7 @@ const EventScreen = ({navigation, route}: Props) => {
   }
 
   return (
-    <ScrollView style={styles.container} >
+    <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
         {eventData && eventData && (
           <>

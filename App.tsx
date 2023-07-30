@@ -1,12 +1,12 @@
 import {NavigationContainer} from '@react-navigation/native';
 import React, {createContext, useEffect, useState} from 'react';
-import HomeStack from './src/navigation/HomeStackNavigator';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {USER} from './constants';
 import {ActivityIndicator} from 'react-native';
 import {UserProfileApi} from './src/api/userprofile';
-import BottomNavigator from "./src/navigation/BottomNavigator";
+import BottomNavigator from './src/navigation/BottomNavigator';
+import AuthStackNavigator from './src/navigation/AuthStackNavigator';
 
 export const queryClient = new QueryClient();
 
@@ -71,7 +71,6 @@ const App = () => {
     fetchUserProfile();
   }, [user]);
 
-
   if (loading) {
     return <ActivityIndicator size="large" />; // отображаем спиннер пока идет загрузка
   }
@@ -87,7 +86,7 @@ const App = () => {
           setUserProfile,
         }}>
         <NavigationContainer>
-          <BottomNavigator />
+          {!user ? <AuthStackNavigator /> : <BottomNavigator />}
         </NavigationContainer>
       </UserContext.Provider>
     </QueryClientProvider>
