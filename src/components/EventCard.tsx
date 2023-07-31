@@ -7,19 +7,21 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import {
   BACKGROUND_MAIN,
   BLACK,
   BLACK_MAIN,
   BLUE,
-  BLUE_MAIN,
+  BLUE_MAIN, GRAY_1, GRAY_2,
   WHITE,
-  WHITE_MAIN,
-} from '../../colors';
+  WHITE_MAIN
+} from "../../colors";
 import {Regular} from '../../fonts';
 import {
-  ADD_USER_FAVOURITE_QUERY_KEY, GET_USER_FAVOURITES_QUERY_KEY,
+  ADD_USER_FAVOURITE_QUERY_KEY,
+  GET_USER_FAVOURITES_QUERY_KEY,
   REMOVE_USER_FAVOURITE_QUERY_KEY,
   useAddUserFavourite,
   useGetUserFavourites,
@@ -108,7 +110,18 @@ const EventCard = ({item, navigation}: any) => {
 
   const handleAddWait = () => {
     if (!userProfileExist) {
-      // ...Ваша логика с алертом...
+      Alert.alert('Profile not found', 'Create your profile first', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Go to Profile',
+          onPress: () => {
+            navigation.navigate('AccountScreen');
+          },
+        },
+      ]);
     } else {
       if (awaitingInvite) {
         removeUserFromEventMutation.mutate(
@@ -263,12 +276,27 @@ const EventCard = ({item, navigation}: any) => {
           )}
           <Pressable
             style={styles.find}
-            onPress={() =>
-              navigation.navigate('FindSwipeScreen', {
-                event: item.id,
-                item: item,
-              })
-            }>
+            onPress={() => {
+              if (userProfileExist) {
+                navigation.navigate('FindSwipeScreen', {
+                  event: item.id,
+                  item: item,
+                });
+              } else {
+                Alert.alert('Profile not found', 'Create your profile first', [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Go to Profile',
+                    onPress: () => {
+                      navigation.navigate('AccountScreen');
+                    },
+                  },
+                ]);
+              }
+            }}>
             <FindPeopleIcon size={15} color={BLACK} style={{marginRight: 5}} />
             <Text style={styles.findText}>Find someone to go with</Text>
           </Pressable>
@@ -335,6 +363,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: Regular,
     lineHeight: 20,
+    backgroundColor: BLACK,
   },
   textDate: {
     color: BLACK_MAIN,
@@ -412,7 +441,7 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject, // Это сделает слой абсолютным и он займет всю область родителя
     backgroundColor: BLACK,
-    opacity: 0.95,
+    opacity: 0.9,
   },
   iconBackground: {
     backgroundColor: BLUE,

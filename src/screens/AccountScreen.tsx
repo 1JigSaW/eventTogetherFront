@@ -2,8 +2,10 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {
   Alert,
+  FlatList,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -11,21 +13,20 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
-  BEIGE,
   BLACK,
   BLACK_MAIN,
   BLUE,
-  BLUE_MAIN,
-  GRAY_1, GRAY_2,
+  GRAY_1,
+  GRAY_2,
   GREEN_MAIN,
   RED_MAIN,
-  WHITE
-} from "../../colors";
-import ProfileIcon from '../components/icons/ProfileIcon';
+  WHITE,
+} from '../../colors';
 import {Bold, Regular} from '../../fonts';
 import {useSearchInterests} from '../queries/interest';
 import {CustomSelector} from '../components/CustomSelector';
@@ -39,7 +40,7 @@ import {UserContext} from '../../App';
 import {useChangePassword} from '../queries/user';
 import {UserProfileData} from '../api/userprofile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {USER} from '../../constants';
+import {COUNTRY, USER} from '../../constants';
 import {
   launchImageLibrary,
   MediaType,
@@ -52,11 +53,14 @@ import {
   request,
 } from 'react-native-permissions';
 import LogoutIcon from '../components/icons/LogoutIcon';
+import PeopleOneIcon from '../components/icons/PeopleOneIcon';
+import Add2Icon from '../components/icons/Add2Icon';
+import {useUniqueCountries} from '../queries/country';
 
 type Props = StackScreenProps<HomeStackParamList, 'AccountScreen'>;
 
 const AccountScreen = ({navigation}: Props) => {
-  const {user, setUserProfileExist, setUserProfile, setUser} =
+  const {user, setUserProfileExist, setUserProfile, setUser, setCountry} =
     useContext(UserContext);
   const [firstName, setFirstName] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -82,6 +86,16 @@ const AccountScreen = ({navigation}: Props) => {
   const [photo, setPhoto] = useState<string | null>(null);
   const [pickedImage, setPickedImage] = useState<string | null>(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [showUpdateProfileSuccess, setShowUpdateProfileSuccess] =
+    useState(false);
+  const [showChangePasswordSuccess, setShowChangePasswordSuccess] =
+    useState(false);
+
+  const [country, setCountryN] = useState('');
+  const {data, isLoading, error} = useUniqueCountries();
+
   const [originalProfileData, setOriginalProfileData] =
     useState<UserProfileData | null>(null);
 
@@ -90,15 +104,83 @@ const AccountScreen = ({navigation}: Props) => {
   const changePasswordMutation = useChangePassword();
   const updateUserProfilePicture = useUpdateUserProfilePicture();
 
+  const handleCountrySelect = async (selectedCountry: string) => {
+    setCountryN(selectedCountry);
+    setModalVisible(false);
+    try {
+      await AsyncStorage.setItem(COUNTRY, selectedCountry);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <View style={{marginLeft: 8}}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModalVisible(true)}>
+            <Text style={styles.buttonText}>{country}</Text>
+          </TouchableOpacity>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <FlatList
+                data={data}
+                keyExtractor={item => item.id}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => handleCountrySelect(item.country)}>
+                    <Text style={styles.listItemText}>{item.country}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </Modal>
+        </View>
+      ),
       headerRight: () => (
         <Pressable style={styles.headerRight} onPress={handleLogout}>
           <LogoutIcon size={25} color={WHITE} />
         </Pressable>
       ),
     });
-  }, [navigation]);
+  }, [country, data, modalVisible, navigation]);
+
+  useEffect(() => {
+    if (updateUserProfileMutation.isSuccess) {
+      setShowUpdateProfileSuccess(true);
+      setTimeout(() => {
+        setShowUpdateProfileSuccess(false);
+      }, 3000);
+    }
+  }, [updateUserProfileMutation.isSuccess]);
+
+  useEffect(() => {
+    if (changePasswordMutation.isSuccess) {
+      setShowChangePasswordSuccess(true);
+      setTimeout(() => {
+        setShowChangePasswordSuccess(false);
+      }, 3000);
+    }
+  }, [changePasswordMutation.isSuccess]);
+
+  useEffect(() => {
+    const fetchCountry = async () => {
+      const storedCountry = await AsyncStorage.getItem(COUNTRY);
+      if (storedCountry) {
+        setCountryN(storedCountry);
+      }
+    };
+
+    fetchCountry();
+  }, []);
 
   useEffect(() => {
     if (userProfileDetailQuery.data) {
@@ -211,7 +293,8 @@ const AccountScreen = ({navigation}: Props) => {
     setUser(null);
     setUserProfile(null);
     setUserProfileExist(false);
-  }, [setUser, setUserProfile, setUserProfileExist]);
+    setCountry(null);
+  }, [setCountry, setUser, setUserProfile, setUserProfileExist]);
 
   const requestStoragePermission = async () => {
     try {
@@ -279,12 +362,12 @@ const AccountScreen = ({navigation}: Props) => {
         {/*)}*/}
         <View style={{flex: 1}}>
           <ScrollView keyboardShouldPersistTaps="always">
-            {updateUserProfileMutation.isSuccess && (
+            {showUpdateProfileSuccess && (
               <Text style={styles.successSave}>
                 Your profile has been successfully updated!
               </Text>
             )}
-            {changePasswordMutation.isSuccess && (
+            {showChangePasswordSuccess && (
               <Text style={styles.successSave}>
                 Your password has been successfully updated!
               </Text>
@@ -304,7 +387,12 @@ const AccountScreen = ({navigation}: Props) => {
                     style={{width: 100, height: 100, borderRadius: 125}}
                   />
                 ) : (
-                  <ProfileIcon size={250} />
+                  <View style={styles.iconBackgroundBig}>
+                    <PeopleOneIcon size={48} />
+                    <View style={styles.smallIconWrapper}>
+                      <Add2Icon size={10} style={styles.smallIcon} />
+                    </View>
+                  </View>
                 )}
               </Pressable>
               <View>
@@ -391,9 +479,9 @@ const AccountScreen = ({navigation}: Props) => {
                 {changePasswordMutation.isError && (
                   <Text style={styles.errorText}>Enter correct password</Text>
                 )}
-                {changePasswordMutation.isSuccess && (
-                  <Text style={styles.successText}>Enter correct password</Text>
-                )}
+                {/*{changePasswordMutation.isSuccess && (*/}
+                {/*  <Text style={styles.successText}>Enter correct password</Text>*/}
+                {/*)}*/}
                 <TextInput
                   style={styles.textInput}
                   placeholder="Old password"
@@ -513,6 +601,52 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     marginRight: 12,
+  },
+  iconBackgroundBig: {
+    backgroundColor: BLUE,
+    borderRadius: 100,
+    padding: 15,
+  },
+  smallIconWrapper: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'white',
+    borderRadius: 100,
+    padding: 5,
+  },
+  smallIcon: {
+    // Возможные стили для маленькой иконки
+  },
+  button: {
+    padding: 5,
+    backgroundColor: BLUE,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: BLACK,
+    textAlign: 'center',
+    fontFamily: Regular,
+  },
+  modalContainer: {
+    justifyContent: 'flex-end',
+    backgroundColor: GRAY_2,
+    padding: 10,
+    marginTop: 70,
+    borderRadius: 15,
+  },
+  listItem: {
+    padding: 10,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  listItemText: {
+    fontSize: 18,
+    color: BLACK,
+    textAlign: 'center',
+    fontFamily: Regular,
   },
 });
 

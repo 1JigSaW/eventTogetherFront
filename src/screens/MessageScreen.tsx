@@ -43,38 +43,54 @@ function MessageScreen({navigation}: Props) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.insideBlock}>
-        {messages.map(message => (
-          <Pressable
-            style={styles.block}
-            key={message.id}
-            onPress={() =>
-              navigation.navigate('ChatScreen', {
-                chat: message.chat.id,
-              })
-            }>
-            <Text style={[styles.textEvent, {fontFamily: Black}]}>
-              {message.chat.event.title}
-            </Text>
-            <Text style={[styles.textEvent, {fontFamily: Black}]}>
-              {new Date(message.chat.event.date).toLocaleDateString()}
-            </Text>
-            {/*{message.chat.user1.id !== userProfile ? (*/}
-            {/*  <Text style={styles.textEvent}>*/}
-            {/*    To: {message.chat.user1.first_name}{' '}*/}
-            {/*    {message.chat.user1.last_name}*/}
-            {/*  </Text>*/}
-            {/*) : (*/}
-            {/*  <Text style={styles.textEvent}>*/}
-            {/*    To: {message.chat.user2.first_name}{' '}*/}
-            {/*    {message.chat.user2.last_name}*/}
-            {/*  </Text>*/}
-            {/*)}*/}
-            <View style={styles.row}>
-              {message.chat.user1.id === userProfile ? (
-                message.chat.user2.image ? (
+        {messages.length > 0 ? (
+          messages.map(message => (
+            <Pressable
+              style={styles.block}
+              key={message.id}
+              onPress={() =>
+                navigation.navigate('ChatScreen', {
+                  chat: message.chat.id,
+                })
+              }>
+              <Text style={[styles.textEvent, {fontFamily: Black}]}>
+                {message.chat.event.title}
+              </Text>
+              <Text style={[styles.textEvent, {fontFamily: Black}]}>
+                {new Date(message.chat.event.date).toLocaleDateString()}
+              </Text>
+              {/*{message.chat.user1.id !== userProfile ? (*/}
+              {/*  <Text style={styles.textEvent}>*/}
+              {/*    To: {message.chat.user1.first_name}{' '}*/}
+              {/*    {message.chat.user1.last_name}*/}
+              {/*  </Text>*/}
+              {/*) : (*/}
+              {/*  <Text style={styles.textEvent}>*/}
+              {/*    To: {message.chat.user2.first_name}{' '}*/}
+              {/*    {message.chat.user2.last_name}*/}
+              {/*  </Text>*/}
+              {/*)}*/}
+              <View style={styles.row}>
+                {message.chat.user1.id === userProfile ? (
+                  message.chat.user2.image ? (
+                    <Image
+                      source={{
+                        uri: message.chat.user2.image?.replace(
+                          'image/upload/',
+                          '',
+                        ),
+                      }}
+                      style={{width: 40, height: 40, borderRadius: 125}}
+                    />
+                  ) : (
+                    <View style={styles.iconBackground}>
+                      <PeopleOneIcon size={20} />
+                    </View>
+                  )
+                ) : message.chat.user1.image ? (
                   <Image
                     source={{
-                      uri: message.chat.user2.image?.replace(
+                      uri: message.chat.user1.image?.replace(
                         'image/upload/',
                         '',
                       ),
@@ -85,28 +101,19 @@ function MessageScreen({navigation}: Props) {
                   <View style={styles.iconBackground}>
                     <PeopleOneIcon size={20} />
                   </View>
-                )
-              ) : message.chat.user1.image ? (
-                <Image
-                  source={{
-                    uri: message.chat.user1.image?.replace('image/upload/', ''),
-                  }}
-                  style={{width: 40, height: 40, borderRadius: 125}}
-                />
-              ) : (
-                <View style={styles.iconBackground}>
-                  <PeopleOneIcon size={20} />
+                )}
+                <View style={styles.messageBlock}>
+                  <Text style={styles.textName}>
+                    {message.sender.first_name} {message.sender.last_name}
+                  </Text>
+                  <Text style={styles.textMessage}>{message.content}</Text>
                 </View>
-              )}
-              <View style={styles.messageBlock}>
-                <Text style={styles.textName}>
-                  {message.sender.first_name} {message.sender.last_name}
-                </Text>
-                <Text style={styles.textMessage}>{message.content}</Text>
               </View>
-            </View>
-          </Pressable>
-        ))}
+            </Pressable>
+          ))
+        ) : (
+          <Text style={styles.textMessage}>There are no dialogues yet</Text>
+        )}
       </View>
     </ScrollView>
   );

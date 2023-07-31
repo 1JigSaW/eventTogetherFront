@@ -6,9 +6,9 @@ import ChatIcon from '../components/icons/ChatIcon';
 import ChatStackNavigator from './ChatStackNavigator';
 import ProfileIcon from '../components/icons/ProfileIcon';
 import AccountStackNavigator from './AccountStackNavigator';
-import { Alert } from "react-native";
-import { useContext } from "react";
-import { UserContext } from "../../App";
+import {Alert} from 'react-native';
+import {useContext} from 'react';
+import {UserContext} from '../../App';
 
 export type BottomNavigatorParamsList = {
   HomeTab: undefined;

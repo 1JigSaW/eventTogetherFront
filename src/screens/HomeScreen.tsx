@@ -145,6 +145,7 @@ const HomeScreen = ({navigation}: Props) => {
     return <EventCard item={item} navigation={navigation} />;
   };
 
+  console.log('userFavourites', userFavourites)
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.insideBlock}>
@@ -158,7 +159,7 @@ const HomeScreen = ({navigation}: Props) => {
             value={search}
           />
         </View>
-        {userFavourites && userFavourites.length > 4 && (
+        {userFavourites && userFavourites?.length !== 0 && (
           <View style={{marginTop: 3}}>
             <View
               style={{
@@ -167,11 +168,12 @@ const HomeScreen = ({navigation}: Props) => {
                 alignItems: 'center',
               }}>
               <Text style={styles.titleFavourites}>My favourites</Text>
-
-              <Pressable
-                onPress={() => navigation.navigate('FavouritesScreen')}>
-                <Text style={styles.titleFavourites}>See all</Text>
-              </Pressable>
+              {userFavourites.length > 4 && (
+                <Pressable
+                  onPress={() => navigation.navigate('FavouritesScreen')}>
+                  <Text style={styles.titleFavourites}>See all</Text>
+                </Pressable>
+              )}
             </View>
             <View style={[styles.row2, {minHeight: 90}]}>
               {isLoadingEvents ? (
@@ -388,12 +390,12 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   eventImage: {
-    width: 80, // Установите ширину для изображения
-    height: 40, // Установите высоту для изображения
+    width: 80,
+    height: 40,
   },
   eventTitle: {
-    marginTop: 5, // Отступ для текста от изображения
-    textAlign: 'center', // Центрируем текст
+    marginTop: 5,
+    textAlign: 'center',
     fontSize: 12,
     color: WHITE,
   },

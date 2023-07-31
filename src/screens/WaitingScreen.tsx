@@ -1,6 +1,7 @@
 import React, {useContext} from 'react';
 import {UserContext} from '../../App';
 import {
+  Alert,
   FlatList,
   Image,
   ListRenderItem,
@@ -9,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { BEIGE, BLACK, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE, WHITE_MAIN } from "../../colors";
+import {BLACK, BLUE, GRAY_1, GRAY_2, WHITE} from '../../colors';
 import {StackScreenProps} from '@react-navigation/stack';
 import {HomeStackParamList} from '../navigation/HomeStackNavigator';
 import {useEventProfiles} from '../queries/event';
@@ -21,7 +22,7 @@ type Props = StackScreenProps<HomeStackParamList, 'WaitingScreen'>;
 
 const WaitingScreen = ({navigation, route}: Props) => {
   const {event} = route.params;
-  const {user} = useContext(UserContext);
+  const {user, userProfileExist} = useContext(UserContext);
   const {data: attendees, isLoading, error} = useEventProfiles(event);
   console.log(attendees?.pages[0].results);
 
@@ -86,12 +87,27 @@ const WaitingScreen = ({navigation, route}: Props) => {
         {item.user !== user && (
           <Pressable
             style={styles.buttonInvite}
-            onPress={() =>
-              navigation.navigate('ChatScreen', {
-                user: item.id,
-                event: event,
-              })
-            }>
+            onPress={() => {
+              if (userProfileExist) {
+                navigation.navigate('ChatScreen', {
+                  user: item.id,
+                  event: event,
+                });
+              } else {
+                Alert.alert('Profile not found', 'Create your profile first', [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Go to Profile',
+                    onPress: () => {
+                      navigation.navigate('AccountScreen');
+                    },
+                  },
+                ]);
+              }
+            }}>
             <Text style={[styles.textAddition, {color: BLACK}]}>Invite</Text>
           </Pressable>
         )}

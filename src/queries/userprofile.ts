@@ -1,5 +1,6 @@
-import {useMutation, useQuery} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {UserProfileApi, UserProfileData} from '../api/userprofile';
+import { queryClient } from "../../App";
 
 export const USER_PROFILE_UPDATE_QUERY_KEY = 'user_profile_update';
 export const USER_PROFILE_DETAIL_QUERY_KEY = 'user_profile_detail';
@@ -42,6 +43,8 @@ export const useUserProfileDetail = (userId: number | null) => {
 };
 
 export const useUpdateUserProfilePicture = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<
     {success: boolean},
     AxiosError,
@@ -53,6 +56,8 @@ export const useUpdateUserProfilePicture = () => {
       onError: error => {
         console.error(error);
       },
+      // Используйте onSuccess, чтобы инвалидировать кэш после успешной мутации
+
     },
   );
 };

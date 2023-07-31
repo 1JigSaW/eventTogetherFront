@@ -2,11 +2,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import React, {createContext, useEffect, useState} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {USER} from './constants';
+import {COUNTRY, USER} from './constants';
 import {ActivityIndicator} from 'react-native';
 import {UserProfileApi} from './src/api/userprofile';
 import BottomNavigator from './src/navigation/BottomNavigator';
 import AuthStackNavigator from './src/navigation/AuthStackNavigator';
+import CountrySelectScreen from './src/screens/CountrySelectScreen';
 
 export const queryClient = new QueryClient();
 
@@ -17,6 +18,8 @@ type UserContextProps = {
   setUserProfileExist: (value: boolean) => void;
   userProfile: number | null;
   setUserProfile: (value: number | null) => void;
+  country: string | null;
+  setCountry: (value: string | null) => void;
 };
 
 export const UserContext = createContext<UserContextProps>({
@@ -26,6 +29,8 @@ export const UserContext = createContext<UserContextProps>({
   setUserProfileExist(): void {},
   userProfile: null,
   setUserProfile(): void {},
+  country: null,
+  setCountry(): void {},
 });
 
 const App = () => {
@@ -33,6 +38,23 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [userProfileExist, setUserProfileExist] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<number | null>(null);
+
+  const [country, setCountry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCountryFromAsyncStorage = async () => {
+      try {
+        const value = await AsyncStorage.getItem(COUNTRY);
+        if (value !== null) {
+          setCountry(value);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getCountryFromAsyncStorage();
+  }, []);
 
   useEffect(() => {
     const getUserFromAsyncStorage = async () => {
@@ -84,9 +106,17 @@ const App = () => {
           setUserProfileExist,
           userProfile,
           setUserProfile,
+          country,
+          setCountry,
         }}>
         <NavigationContainer>
-          {!user ? <AuthStackNavigator /> : <BottomNavigator />}
+          {!user ? (
+            <AuthStackNavigator />
+          ) : !country ? (
+            <CountrySelectScreen />
+          ) : (
+            <BottomNavigator />
+          )}
         </NavigationContainer>
       </UserContext.Provider>
     </QueryClientProvider>
