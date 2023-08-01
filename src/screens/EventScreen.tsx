@@ -289,58 +289,63 @@ const EventScreen = ({navigation, route}: Props) => {
               </Text>
             </>
           )}
-          <Text style={styles.titleAttendees}>Attendees:</Text>
-          <Pressable
-            onPress={() =>
-              navigation.navigate('WaitingScreen', {event: eventId})
-            }
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 8,
-              marginLeft: 30,
-            }}>
-            {allAttendees.map((attendee, index) => (
-              <View key={index} style={styles.oneAttend}>
-                {!attendee?.image ? (
-                  <View style={[styles.iconBackgroundBig, {marginLeft: -30}]}>
-                    <PeopleOneIcon size={40} />
+          {allAttendees.length > 0 && (
+            <>
+              <Text style={styles.titleAttendees}>Attendees:</Text>
+              <Pressable
+                onPress={() =>
+                  navigation.navigate('WaitingScreen', {event: eventId})
+                }
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: 8,
+                  marginLeft: 30,
+                }}>
+                {allAttendees.map((attendee, index) => (
+                  <View key={index} style={styles.oneAttend}>
+                    {!attendee?.image ? (
+                      <View
+                        style={[styles.iconBackgroundBig, {marginLeft: -30}]}>
+                        <PeopleOneIcon size={40} />
+                      </View>
+                    ) : (
+                      <Image
+                        source={{
+                          uri: attendee?.image.replace('image/upload/', ''),
+                        }}
+                        style={{
+                          width: 55,
+                          height: 55,
+                          borderRadius: 125,
+                          marginLeft: -30,
+                        }}
+                      />
+                    )}
                   </View>
-                ) : (
-                  <Image
-                    source={{
-                      uri: attendee?.image.replace('image/upload/', ''),
-                    }}
-                    style={{
-                      width: 55,
-                      height: 55,
-                      borderRadius: 125,
-                      marginLeft: -30,
-                    }}
-                  />
-                )}
-              </View>
-            ))}
-            <View>
-              {invitesCount > 5 && (
-                <>
-                  <Text style={styles.textCountPeople}>
-                    + {invitesCount - 5}
-                  </Text>
-                  <Text style={styles.textCountPeople}>members</Text>
-                </>
-              )}
-            </View>
-            {/*<Pressable*/}
-            {/*  style={{alignItems: 'center', marginLeft: 4}}*/}
-            {/*  onPress={handleAddWait}>*/}
-            {/*  {!awaitingInvite ? (*/}
-            {/*    <AddIcon size={300} color={BLACK_MAIN} />*/}
-            {/*  ) : (*/}
-            {/*    <RemoveIcon size={300} color={BLACK_MAIN} />*/}
-            {/*  )}*/}
-            {/*</Pressable>*/}
-          </Pressable>
+                ))}
+                <View>
+                  {invitesCount > 5 && (
+                    <>
+                      <Text style={styles.textCountPeople}>
+                        + {invitesCount - 5}
+                      </Text>
+                      <Text style={styles.textCountPeople}>members</Text>
+                    </>
+                  )}
+                </View>
+                {/*<Pressable*/}
+                {/*  style={{alignItems: 'center', marginLeft: 4}}*/}
+                {/*  onPress={handleAddWait}>*/}
+                {/*  {!awaitingInvite ? (*/}
+                {/*    <AddIcon size={300} color={BLACK_MAIN} />*/}
+                {/*  ) : (*/}
+                {/*    <RemoveIcon size={300} color={BLACK_MAIN} />*/}
+                {/*  )}*/}
+                {/*</Pressable>*/}
+              </Pressable>
+            </>
+          )}
         </View>
         {/*<View style={styles.attendeesBlock}>*/}
         {/*  <Pressable*/}
