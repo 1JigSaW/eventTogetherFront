@@ -397,24 +397,23 @@ const AccountScreen = ({navigation}: Props) => {
               </Pressable>
               <View>
                 <Text style={styles.infoText}>Info:</Text>
-                <View style={{flex: 1, justifyContent: 'center'}}>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      firstNameTouched &&
-                        !firstNameValid &&
-                        firstName === '' &&
-                        styles.error,
-                    ]}
-                    placeholder="First Name"
-                    placeholderTextColor={GRAY_1}
-                    value={firstName}
-                    onChangeText={text => {
-                      setFirstName(text);
-                      setFirstNameTouched(true);
-                    }}
-                  />
-                </View>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    firstNameTouched &&
+                      !firstNameValid &&
+                      firstName === '' &&
+                      styles.error,
+                  ]}
+                  multiline={true}
+                  placeholder="First Name"
+                  placeholderTextColor={GRAY_1}
+                  value={firstName}
+                  onChangeText={text => {
+                    setFirstName(text);
+                    setFirstNameTouched(true);
+                  }}
+                />
                 <TextInput
                   style={[
                     styles.textInput,
@@ -423,6 +422,7 @@ const AccountScreen = ({navigation}: Props) => {
                       secondName === '' &&
                       styles.error,
                   ]}
+                  multiline={true}
                   placeholder="Second Name"
                   placeholderTextColor={GRAY_1}
                   value={secondName}
@@ -463,6 +463,7 @@ const AccountScreen = ({navigation}: Props) => {
                     styles.textInput,
                     !ageValid && age === '' && styles.error,
                   ]}
+                  multiline={true}
                   placeholder="Age"
                   placeholderTextColor={GRAY_1}
                   value={age}
@@ -474,6 +475,7 @@ const AccountScreen = ({navigation}: Props) => {
                   placeholderTextColor={GRAY_1}
                   value={description}
                   onChangeText={setDescription}
+                  multiline={true}
                 />
               </View>
               <View style={styles.passwordBlock}>
@@ -489,6 +491,7 @@ const AccountScreen = ({navigation}: Props) => {
                   placeholder="Old password"
                   placeholderTextColor={GRAY_1}
                   value={oldPassword}
+                  multiline={true}
                   onChangeText={setOldPassword}
                   secureTextEntry={true}
                 />
@@ -497,6 +500,7 @@ const AccountScreen = ({navigation}: Props) => {
                   placeholder="New password"
                   placeholderTextColor={GRAY_1}
                   value={newPassword}
+                  multiline={true}
                   onChangeText={setNewPassword}
                   secureTextEntry={true}
                 />
@@ -549,13 +553,12 @@ const styles = StyleSheet.create({
     borderColor: GRAY_1,
     marginTop: 8,
     borderRadius: 15,
-    lineHeight: 32,
+    height: 32,
     paddingHorizontal: 10,
     fontSize: 16,
     color: WHITE,
     fontFamily: Regular,
-    paddingVertical: 4, // Increase padding to fit the text within the box
-    textAlignVertical: 'center', // Center-align text vertically
+    flex: 1,
   },
   passwordBlock: {
     marginTop: 50,

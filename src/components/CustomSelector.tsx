@@ -51,6 +51,7 @@ export const CustomSelector: React.FC<Props> = ({
           placeholderTextColor={GRAY_1}
           value={query}
           placeholder={placeholder}
+          multiline={true}
         />
       </View>
       <View style={styles.dropBlock}>
@@ -106,13 +107,12 @@ const styles = StyleSheet.create({
     borderColor: GRAY_1,
     borderRadius: 15,
     borderWidth: 1,
-    lineHeight: 32,
     paddingHorizontal: 10,
     fontSize: 16,
     color: WHITE,
     fontFamily: Regular,
     paddingVertical: 4,
-    height: 40,
+    height: 32,
     flexGrow: 1,
   },
   dropBlock: {
