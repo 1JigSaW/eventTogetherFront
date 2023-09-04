@@ -554,7 +554,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: WHITE,
     fontFamily: Regular,
-    paddingVertical: 4,
+    paddingVertical: 4, // Increase padding to fit the text within the box
+    textAlignVertical: 'center', // Center-align text vertically
   },
   passwordBlock: {
     marginTop: 50,
