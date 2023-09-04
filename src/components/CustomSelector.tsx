@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     color: WHITE,
     fontFamily: Regular,
     paddingVertical: 4,
-    height: 32,
+    height: 40,
     flexGrow: 1,
   },
   dropBlock: {
