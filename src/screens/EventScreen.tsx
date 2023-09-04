@@ -17,12 +17,12 @@ import {
   Alert,
   Image,
   ImageBackground,
-  Pressable,
+  Pressable, SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  View,
-} from 'react-native';
+  View
+} from "react-native";
 import {Event} from '../api/event.api';
 import {
   BLACK,
@@ -250,6 +250,7 @@ const EventScreen = ({navigation, route}: Props) => {
 
   return (
     <ScrollView style={styles.container}>
+      <SafeAreaView style={{flex: 0, backgroundColor: BLACK}}>
       <View style={styles.insideBlock}>
         {eventData && eventData && (
           <>
@@ -363,6 +364,7 @@ const EventScreen = ({navigation, route}: Props) => {
         {/*  </Pressable>*/}
         {/*</View>*/}
       </View>
+      </SafeAreaView>
     </ScrollView>
   );
 };

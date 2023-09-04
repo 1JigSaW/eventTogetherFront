@@ -397,22 +397,24 @@ const AccountScreen = ({navigation}: Props) => {
               </Pressable>
               <View>
                 <Text style={styles.infoText}>Info:</Text>
-                <TextInput
-                  style={[
-                    styles.textInput,
-                    firstNameTouched &&
-                      !firstNameValid &&
-                      firstName === '' &&
-                      styles.error,
-                  ]}
-                  placeholder="First Name"
-                  placeholderTextColor={GRAY_1}
-                  value={firstName}
-                  onChangeText={text => {
-                    setFirstName(text);
-                    setFirstNameTouched(true);
-                  }}
-                />
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                  <TextInput
+                    style={[
+                      styles.textInput,
+                      firstNameTouched &&
+                        !firstNameValid &&
+                        firstName === '' &&
+                        styles.error,
+                    ]}
+                    placeholder="First Name"
+                    placeholderTextColor={GRAY_1}
+                    value={firstName}
+                    onChangeText={text => {
+                      setFirstName(text);
+                      setFirstNameTouched(true);
+                    }}
+                  />
+                </View>
                 <TextInput
                   style={[
                     styles.textInput,
