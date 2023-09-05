@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     borderColor: GRAY_1,
     marginTop: 8,
     borderRadius: 15,
-    height: 40,
+    height: Platform.OS === 'android' ? 40 : 30,
     paddingHorizontal: 10,
     fontSize: 16,
     color: WHITE,

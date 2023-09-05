@@ -247,7 +247,7 @@ const EventScreen = ({navigation, route}: Props) => {
       minute: '2-digit',
     });
   }
-
+  console.log(eventData.image);
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={{flex: 0, backgroundColor: BLACK}}>

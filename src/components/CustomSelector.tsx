@@ -5,8 +5,8 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ViewStyle,
-} from 'react-native';
+  ViewStyle, Platform
+} from "react-native";
 import { BEIGE, BLACK_MAIN, BLUE, GRAY_1, GRAY_2, ORANGE_MAIN, WHITE, WHITE_MAIN } from "../../colors";
 import CloseIcon from './icons/CloseIcon';
 import {Regular} from '../../fonts';
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     color: WHITE,
     fontFamily: Regular,
     paddingVertical: 4,
-    height: 40,
+    height: Platform.OS === 'android' ? 40 : 30,
     flexGrow: 1,
   },
   dropBlock: {
