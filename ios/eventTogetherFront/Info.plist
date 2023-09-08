@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string>App needs access to your library</string>
+    <string>We need access to your photo library for avatar</string>
     <key>NSCameraUsageDescription</key>
     <string>App needs access to your camera</string>
 	<key>LSRequiresIPhoneOS</key>

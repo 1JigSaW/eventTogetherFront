@@ -31,7 +31,9 @@ const WaitingScreen = ({navigation, route}: Props) => {
   const renderItem: ListRenderItem<UserProfileData> = ({item}) => {
     const languages = item.language.map(lang => lang).join(', ');
     const interests = item.interests.map(inter => inter).join(', ');
-    let image_url = item.image?.replace('image/upload/', '');
+    let image_url = item.image
+      ?.replace('http://', 'https://')
+      .replace('image/upload/', '');
     return (
       <View style={styles.block}>
         <View style={styles.row}>

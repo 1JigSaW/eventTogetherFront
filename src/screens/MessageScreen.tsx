@@ -75,7 +75,7 @@ function MessageScreen({navigation}: Props) {
                   message.chat.user2.image ? (
                     <Image
                       source={{
-                        uri: message.chat.user2.image?.replace(
+                        uri: message.chat.user2.image?.replace('http://', 'https://').replace(
                           'image/upload/',
                           '',
                         ),
@@ -90,7 +90,7 @@ function MessageScreen({navigation}: Props) {
                 ) : message.chat.user1.image ? (
                   <Image
                     source={{
-                      uri: message.chat.user1.image?.replace(
+                      uri: message.chat.user1.image?.replace('http://', 'https://').replace(
                         'image/upload/',
                         '',
                       ),

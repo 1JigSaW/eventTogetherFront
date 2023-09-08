@@ -11,7 +11,13 @@ const UserCard = ({user}: any) => (
   <View style={styles.userBlock}>
     {user.image && (
       <Image
-        source={{uri: user.image?.replace('image/upload/', '')}}
+        source={{
+          uri: user.image
+            ? user.image
+                .replace('http://', 'https://')
+                .replace('image/upload/', '')
+            : null,
+        }}
         style={{
           width: 160,
           height: 160,

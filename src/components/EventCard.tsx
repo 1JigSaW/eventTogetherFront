@@ -189,7 +189,9 @@ const EventCard = ({item, navigation}: any) => {
       <ImageBackground
         source={{
           uri: item.image
-            ? item.image.replace('image/upload/', '')
+            ? item.image
+                .replace('http://', 'https://')
+                .replace('image/upload/', '')
             : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
         }}
         style={styles.imageBlock}
@@ -247,7 +249,11 @@ const EventCard = ({item, navigation}: any) => {
                   ) : (
                     <Image
                       source={{
-                        uri: attendee?.image.replace('image/upload/', ''),
+                        uri: attendee?.image
+                          ? attendee.image
+                              .replace('http://', 'https://')
+                              .replace('image/upload/', '')
+                          : null,
                       }}
                       style={{
                         width: 25,

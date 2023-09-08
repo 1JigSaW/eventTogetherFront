@@ -79,7 +79,9 @@ const HomeScreen = ({navigation}: Props) => {
     if (userProfileDetailQuery.data) {
       const profileData = userProfileDetailQuery.data;
       if (profileData.image) {
-        let image_url = profileData.image.replace('image/upload/', '');
+        let image_url = profileData.image
+          .replace('http://', 'https://')
+          .replace('image/upload/', '');
         setPhoto(image_url);
       }
     }
@@ -145,7 +147,7 @@ const HomeScreen = ({navigation}: Props) => {
     return <EventCard item={item} navigation={navigation} />;
   };
 
-  console.log('userFavourites', userFavourites)
+  console.log('userFavourites', userFavourites);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.insideBlock}>
@@ -191,7 +193,9 @@ const HomeScreen = ({navigation}: Props) => {
                       <Image
                         source={{
                           uri: event.image
-                            ? event.image.replace('image/upload/', '')
+                            ? event.image
+                                .replace('http://', 'https://')
+                                .replace('image/upload/', '')
                             : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
                         }}
                         resizeMode="contain"
@@ -201,7 +205,9 @@ const HomeScreen = ({navigation}: Props) => {
                       <Image
                         source={{
                           uri: event.image
-                            ? event.image.replace('image/upload/', '')
+                            ? event.image
+                                .replace('http://', 'https://')
+                                .replace('image/upload/', '')
                             : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
                         }}
                         resizeMode="contain"

@@ -186,7 +186,9 @@ const AccountScreen = ({navigation}: Props) => {
     if (userProfileDetailQuery.data) {
       const profileData = userProfileDetailQuery.data;
       if (profileData.image) {
-        let image_url = profileData.image.replace('image/upload/', '');
+        let image_url = profileData.image
+          .replace('http://', 'https://')
+          .replace('image/upload/', '');
         setPhoto(image_url);
         console.log(image_url);
       }

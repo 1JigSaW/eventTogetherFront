@@ -17,12 +17,13 @@ import {
   Alert,
   Image,
   ImageBackground,
-  Pressable, SafeAreaView,
+  Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  View
-} from "react-native";
+  View,
+} from 'react-native';
 import {Event} from '../api/event.api';
 import {
   BLACK,
@@ -247,123 +248,124 @@ const EventScreen = ({navigation, route}: Props) => {
       minute: '2-digit',
     });
   }
-  console.log(eventData.image);
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={{flex: 0, backgroundColor: BLACK}}>
-      <View style={styles.insideBlock}>
-        {eventData && eventData && (
-          <>
-            <ImageBackground
-              source={{
-                uri: eventData.image
-                  ? eventData.image.replace('image/upload/', '')
-                  : 'https://res.cloudinary.com/dcrvubswi/image/upload/v1690060307/download_smfthh.jpg',
-              }}
-              style={{height: 200, marginBottom: 5, marginTop: 10}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  padding: 10,
-                  backgroundColor: 'rgba(0,0,0,0.7)',
-                }}>
-                <Text style={{color: 'white', fontSize: 16}}>
-                  {eventData.title}
-                </Text>
-                <Text style={{color: 'white', fontSize: 16}}>
-                  {dateString} {timeString}
-                </Text>
-                <Text style={{color: 'white', fontSize: 16}}>
-                  {eventData.city}
-                </Text>
-              </View>
-            </ImageBackground>
-          </>
-        )}
-        <View style={styles.additionalBlock}>
-          {eventData && eventData.description && (
+        <View style={styles.insideBlock}>
+          {eventData && eventData && (
             <>
-              <Text style={styles.textDescriptionTitle}>Description:</Text>
-              <Text style={styles.textDescription}>
-                {eventData.description}
-              </Text>
+              <ImageBackground
+                source={{
+                  uri: eventData.image
+                    ? eventData.image.replace('http://', 'https://').replace('image/upload/', '')
+                    : 'https://your_default_image_url_here.jpg'
+                }}
+                style={{height: 200, marginBottom: 5, marginTop: 10}}>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'flex-end',
+                    padding: 10,
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                  }}>
+                  <Text style={{color: 'white', fontSize: 16}}>
+                    {eventData.title}
+                  </Text>
+                  <Text style={{color: 'white', fontSize: 16}}>
+                    {dateString} {timeString}
+                  </Text>
+                  <Text style={{color: 'white', fontSize: 16}}>
+                    {eventData.city}
+                  </Text>
+                </View>
+              </ImageBackground>
             </>
           )}
-          {allAttendees.length > 0 && (
-            <>
-              <Text style={styles.titleAttendees}>Attendees:</Text>
-              <Pressable
-                onPress={() =>
-                  navigation.navigate('WaitingScreen', {event: eventId})
-                }
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: 8,
-                  marginLeft: 30,
-                }}>
-                {allAttendees.map((attendee, index) => (
-                  <View key={index} style={styles.oneAttend}>
-                    {!attendee?.image ? (
-                      <View
-                        style={[styles.iconBackgroundBig, {marginLeft: -30}]}>
-                        <PeopleOneIcon size={40} />
-                      </View>
-                    ) : (
-                      <Image
-                        source={{
-                          uri: attendee?.image.replace('image/upload/', ''),
-                        }}
-                        style={{
-                          width: 55,
-                          height: 55,
-                          borderRadius: 125,
-                          marginLeft: -30,
-                        }}
-                      />
+          <View style={styles.additionalBlock}>
+            {eventData && eventData.description && (
+              <>
+                <Text style={styles.textDescriptionTitle}>Description:</Text>
+                <Text style={styles.textDescription}>
+                  {eventData.description}
+                </Text>
+              </>
+            )}
+            {allAttendees.length > 0 && (
+              <>
+                <Text style={styles.titleAttendees}>Attendees:</Text>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('WaitingScreen', {event: eventId})
+                  }
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: 8,
+                    marginLeft: 30,
+                  }}>
+                  {allAttendees.map((attendee, index) => (
+                    <View key={index} style={styles.oneAttend}>
+                      {!attendee?.image ? (
+                        <View
+                          style={[styles.iconBackgroundBig, {marginLeft: -30}]}>
+                          <PeopleOneIcon size={40} />
+                        </View>
+                      ) : (
+                        <Image
+                          source={{
+                            uri: attendee?.image
+                              .replace('http://', 'https://')
+                              .replace('image/upload/', ''),
+                          }}
+                          style={{
+                            width: 55,
+                            height: 55,
+                            borderRadius: 125,
+                            marginLeft: -30,
+                          }}
+                        />
+                      )}
+                    </View>
+                  ))}
+                  <View>
+                    {invitesCount > 5 && (
+                      <>
+                        <Text style={styles.textCountPeople}>
+                          + {invitesCount - 5}
+                        </Text>
+                        <Text style={styles.textCountPeople}>members</Text>
+                      </>
                     )}
                   </View>
-                ))}
-                <View>
-                  {invitesCount > 5 && (
-                    <>
-                      <Text style={styles.textCountPeople}>
-                        + {invitesCount - 5}
-                      </Text>
-                      <Text style={styles.textCountPeople}>members</Text>
-                    </>
-                  )}
-                </View>
-                {/*<Pressable*/}
-                {/*  style={{alignItems: 'center', marginLeft: 4}}*/}
-                {/*  onPress={handleAddWait}>*/}
-                {/*  {!awaitingInvite ? (*/}
-                {/*    <AddIcon size={300} color={BLACK_MAIN} />*/}
-                {/*  ) : (*/}
-                {/*    <RemoveIcon size={300} color={BLACK_MAIN} />*/}
-                {/*  )}*/}
-                {/*</Pressable>*/}
-              </Pressable>
-            </>
-          )}
+                  {/*<Pressable*/}
+                  {/*  style={{alignItems: 'center', marginLeft: 4}}*/}
+                  {/*  onPress={handleAddWait}>*/}
+                  {/*  {!awaitingInvite ? (*/}
+                  {/*    <AddIcon size={300} color={BLACK_MAIN} />*/}
+                  {/*  ) : (*/}
+                  {/*    <RemoveIcon size={300} color={BLACK_MAIN} />*/}
+                  {/*  )}*/}
+                  {/*</Pressable>*/}
+                </Pressable>
+              </>
+            )}
+          </View>
+          {/*<View style={styles.attendeesBlock}>*/}
+          {/*  <Pressable*/}
+          {/*    onPress={() =>*/}
+          {/*      navigation.navigate('WaitingScreen', {event: eventId})*/}
+          {/*    }*/}
+          {/*    style={{*/}
+          {/*      width: '95%',*/}
+          {/*      alignItems: 'center',*/}
+          {/*      marginTop: 6,*/}
+          {/*      borderWidth: 1,*/}
+          {/*      borderRadius: 15,*/}
+          {/*    }}>*/}
+          {/*    <Text style={styles.allUsers}>See all</Text>*/}
+          {/*  </Pressable>*/}
+          {/*</View>*/}
         </View>
-        {/*<View style={styles.attendeesBlock}>*/}
-        {/*  <Pressable*/}
-        {/*    onPress={() =>*/}
-        {/*      navigation.navigate('WaitingScreen', {event: eventId})*/}
-        {/*    }*/}
-        {/*    style={{*/}
-        {/*      width: '95%',*/}
-        {/*      alignItems: 'center',*/}
-        {/*      marginTop: 6,*/}
-        {/*      borderWidth: 1,*/}
-        {/*      borderRadius: 15,*/}
-        {/*    }}>*/}
-        {/*    <Text style={styles.allUsers}>See all</Text>*/}
-        {/*  </Pressable>*/}
-        {/*</View>*/}
-      </View>
       </SafeAreaView>
     </ScrollView>
   );

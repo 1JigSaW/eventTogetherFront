@@ -16,6 +16,7 @@
     "PhotoLibraryAddOnly"
   ],
   "dependencies": {
+    "@babel/parser": "^7.22.15",
     "@react-native-async-storage/async-storage": "^1.18.2",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.6",
@@ -41,8 +42,8 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@babel/preset-env": "^7.20.0",
+    "@babel/core": "^7.22.15",
+    "@babel/preset-env": "^7.22.15",
     "@babel/runtime": "^7.20.0",
     "@react-native-community/eslint-config": "^3.2.0",
     "@tsconfig/react-native": "^2.0.2",
