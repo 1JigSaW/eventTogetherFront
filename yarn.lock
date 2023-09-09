@@ -6256,6 +6256,11 @@ react-native-autocomplete-input@^5.3.2:
   dependencies:
     deprecated-react-native-prop-types "^2.3.0"
 
+react-native-cli-bump-version@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/react-native-cli-bump-version/-/react-native-cli-bump-version-1.5.0.tgz"
+  integrity sha512-B7eHE5gpVfc5Py90rU+cZsPEbaiz6wsFjxZrPbsKw1oyk/04Ae72ipQbAl/Y8FYK5AcvkyYf/DwQkTcDkKOEPA==
+
 react-native-codegen@^0.71.5:
   version "0.71.5"
   resolved "https://registry.npmjs.org/react-native-codegen/-/react-native-codegen-0.71.5.tgz"
