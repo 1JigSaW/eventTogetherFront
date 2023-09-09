@@ -47,10 +47,12 @@ import {
   PhotoQuality,
 } from 'react-native-image-picker';
 import {
+  check,
   Permission,
   PERMISSIONS,
   PermissionStatus,
   request,
+  RESULTS,
 } from 'react-native-permissions';
 import LogoutIcon from '../components/icons/LogoutIcon';
 import PeopleOneIcon from '../components/icons/PeopleOneIcon';
@@ -300,7 +302,7 @@ const AccountScreen = ({navigation}: Props) => {
 
   const requestStoragePermission = async () => {
     try {
-      let permission: Permission | undefined;
+      let permission;
       if (Platform.OS === 'android') {
         permission = PERMISSIONS.ANDROID.READ_MEDIA_IMAGES;
       } else if (Platform.OS === 'ios') {
@@ -308,21 +310,31 @@ const AccountScreen = ({navigation}: Props) => {
       }
 
       if (permission) {
-        console.log('Requesting permission...');
-        const result: PermissionStatus = await request(permission);
-        console.log('Permission result:', result);
-
-        if (result === 'granted') {
+        const status = await check(permission);
+        console.log('status', status)
+        // If permission is already granted, proceed to pick image
+        if (status === RESULTS.GRANTED) {
           pickImage();
-        } else {
-          Alert.alert(
-            'Permission Required',
-            'Please grant permission to access photo library.',
-          );
+          return;
+        }
+
+        // If permission is not determined or denied, proceed to request
+        if (status === RESULTS.DENIED || status === RESULTS.UNAVAILABLE) {
+          console.log('Requesting permission...');
+          const result = await request(permission);
+          console.log(result)
+          if (result === RESULTS.GRANTED) {
+            pickImage();
+          } else {
+            Alert.alert(
+              'Permission Required',
+              'Please grant permission to access photo library.',
+            );
+          }
         }
       }
     } catch (error) {
-      console.error('handleOpenFromLibrary error:', error);
+      console.error('An error occurred while requesting permission:', error);
     }
   };
 
