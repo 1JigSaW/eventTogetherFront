@@ -47,11 +47,6 @@ target 'eventTogetherFront' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'eventTogetherFrontTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -59,6 +54,11 @@ target 'eventTogetherFront' do
       # necessary for Mac Catalyst builds
       :mac_catalyst_enabled => false
     )
+    installer.pods_project.targets.each do |target|
+            if target.name == "React-Core.common-AccessibilityResources"
+              target.remove_from_project
+            end
+          end
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end
