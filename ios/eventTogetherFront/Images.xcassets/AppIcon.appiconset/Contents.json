@@ -1,12 +1,4 @@
 {
-  "images" : [
-    {
-      "filename" : "jigsaw_flat_geometric_vector_graphic_logo_for_startup_business__0bdadf84-93dc-4054-8ed8-a162e3a6ee7e.png",
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
-    }
-  ],
   "info" : {
     "author" : "xcode",
     "version" : 1
